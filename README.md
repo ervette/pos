@@ -1,2 +1,3 @@
-# pos
-This Dissertation project provides to evaluation paper regarding the Cloud-based, on-premises and Hybrid POS Systems and provide implementation of advanced technologies such as machine learning and IoT to improve POS systems’ capabilities.
+# POS (Point of Sale) by Kiril Talalaiko
+
+The Project aims to evaluate and optimise cloud-based POS systems by conducting a detailed comparative analysis against on-premises systems. This dissertation focuses on measuring main performance, scalability, fault-tolerance and security, as well as the implementation of advanced technologies such as machine learning and IoT to improve POS systems’ capabilities. The milestone for the project itself is to research the advantages and insights between different systems to conclude how to enhance current POS systems. That will benefit business operations by highlighting the pros of existing system types and their vulnerabilities.
