@@ -9,7 +9,7 @@ const Order = require("./models/order.model");
 import path from "path";
 import { Request, Response } from "express";
 import analyticsRoutes from "./routes/analytics.routes"
-import menyRoutes from "./routes/menu.routes"
+import menuRoutes from "./routes/menu.routes"
 
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
@@ -39,6 +39,7 @@ app.get("/api", (req: Request, res: Response) => {
 })
 
 app.use("/api/analytics", analyticsRoutes);
+app.use("api/menu", menuRoutes);
 
 const PORT = process.env.PORT || 5050;
 app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
