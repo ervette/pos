@@ -1,11 +1,11 @@
-import Menu from "../models/menu.model";
 import Order from "../models/order.model";
+import Menu from "../models/menu.model";
 
 /**
  * Get total sales grouped by superCategory.
  */
-export const getTotalSalesByCategory = async () => {
-  const sales = await Order.aggregate([
+export const getTotalSalesByCategory = async (): Promise<any> => {
+  return await Order.aggregate([
     { $unwind: "$items" }, // Flatten items array
     {
       $lookup: {
@@ -24,15 +24,36 @@ export const getTotalSalesByCategory = async () => {
     },
     { $sort: { totalSales: -1 } },
   ]);
-
-  return sales;
 };
 
 /**
- * Get items with stock below a threshold.
+ * Get daily sales report.
  */
-export const getLowStockItems = async (threshold: number) => {
-  const lowStockItems = await Menu.aggregate([
+export const getDailySales = async (date: Date): Promise<any> => {
+  const startOfDay = new Date(date);
+  startOfDay.setHours(0, 0, 0, 0);
+
+  const endOfDay = new Date(startOfDay);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  return await Order.aggregate([
+    { $match: { createdAt: { $gte: startOfDay, $lte: endOfDay } } },
+    { $unwind: "$items" },
+    {
+      $group: {
+        _id: null,
+        totalSales: { $sum: "$items.totalItemPrice" },
+      },
+    },
+    { $project: { _id: 0, totalSales: 1 } },
+  ]);
+};
+
+/**
+ * Get low-stock items.
+ */
+export const getLowStockItems = async (threshold: number): Promise<any> => {
+  return await Menu.aggregate([
     { $unwind: "$items" },
     { $unwind: "$items.variations" },
     { $match: { "items.variations.quantity": { $lt: threshold } } },
@@ -43,30 +64,23 @@ export const getLowStockItems = async (threshold: number) => {
         quantity: "$items.variations.quantity",
       },
     },
-    { $sort: { quantity: 1 } }, // Sort by lowest stock first
+    { $sort: { quantity: 1 } },
   ]);
-
-  return lowStockItems;
 };
 
 /**
- * Get daily sales report.
+ * Get most popular items by order count.
  */
-export const getDailySales = async () => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0); // Start of the day
-
-  const sales = await Order.aggregate([
-    { $match: { createdAt: { $gte: today } } }, // Filter orders created today
+export const getPopularItems = async (): Promise<any> => {
+  return await Order.aggregate([
     { $unwind: "$items" },
     {
       $group: {
-        _id: null,
-        totalSales: { $sum: "$items.totalItemPrice" },
+        _id: "$items.name",
+        orderCount: { $sum: 1 },
       },
     },
-    { $project: { _id: 0, totalSales: 1 } }, // Remove _id field from output
+    { $sort: { orderCount: -1 } },
+    { $limit: 10 }, // Top 10 popular items
   ]);
-
-  return sales[0]?.totalSales || 0;
 };

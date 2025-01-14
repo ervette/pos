@@ -1,55 +1,37 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-interface ITable {
-  tableNumber: number;
-  capacity: number;
-  status: "available" | "occupied";
-}
-
-interface IUser {
-  username: string;
-  password: string;
-  role: "admin" | "manager" | "staff";
-}
-
-interface IConfig extends Document {
-  currency: "USD" | "GBP" | "EUR";
-  tableArrangement: { tables: ITable[] };
-  users: IUser[];
-  appParameters: {
-    printerConnection: string;
-    taxRate: number;
+interface IConfiguration extends Document {
+  currency: "USD" | "GBP" | "EUR";    // Currency setting
+  tables: number[];                   // List of table numbers
+  printer: {
+    ip: string;                       // Printer IP address
+    port: number;                     // Printer port
+    enabled: boolean;                 // Whether printing is enabled
   };
-  createdAt: Date;
-  updatedAt: Date;
+  theme: "light" | "dark" | "system"; // App appearance
+  language: string;                   // Language code (ISO 639-1)
+  timezone: string;                   // Timezone identifier
+  orderPrefix: string;                // Prefix for order IDs
+  nextOrderNumber: number;            // Next order ID number
+  serviceChargeRate: number;          // Service charge rate (percentage)
 }
 
-const ConfigSchema = new Schema<IConfig>({
-  currency: { type: String, enum: ["USD", "GBP", "EUR"], default: "GBP" },
-  tableArrangement: {
-    tables: [
-      {
-        tableNumber: { type: Number, required: true },
-        capacity: { type: Number, required: true },
-        status: { type: String, enum: ["available", "occupied"], default: "available" },
-      },
-    ],
+const ConfigSchema = new Schema<IConfiguration>({
+  currency: { type: String, enum: ["USD", "GBP", "EUR"], default: "USD" },
+  tables: { type: [Number], default: [] },
+  printer: {
+    ip: { type: String, required: true },
+    port: { type: Number, required: true },
+    enabled: { type: Boolean, default: true },
   },
-  users: [
-    {
-      username: { type: String, required: true },
-      password: { type: String, required: true },
-      role: { type: String, enum: ["admin", "manager", "staff"], required: true },
-    },
-  ],
-  appParameters: {
-    printerConnection: { type: String, required: true },
-    taxRate: { type: Number, default: 0.2 },
-  },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
+  theme: { type: String, enum: ["light", "dark", "system"], default: "system" },
+  language: { type: String, default: "en" },
+  timezone: { type: String, default: "GMT" },
+  orderPrefix: { type: String, default: "ORD-" },
+  nextOrderNumber: { type: Number, default: 1 },
+  serviceChargeRate: { type: Number, default: 0 },
 });
 
-const Config = mongoose.model<IConfig>("Config", ConfigSchema);
+const Config = mongoose.model<IConfiguration>("Config", ConfigSchema);
 
 export default Config;
