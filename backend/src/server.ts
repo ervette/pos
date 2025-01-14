@@ -9,6 +9,7 @@ const Order = require("./models/order.model");
 import path from "path";
 import { Request, Response } from "express";
 import analyticsRoutes from "./routes/analytics.routes"
+import menyRoutes from "./routes/menu.routes"
 
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
@@ -23,7 +24,7 @@ app.use(cors());
 
 // Connect to MongoDB Atlas
 mongoose
-  .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(process.env.MONGO_URI || "mongodb://localhost:27017/pos", { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("MongoDB Connected"))
   .catch((err: Error) => console.error("Database Connection Failed:", err.message));
 
