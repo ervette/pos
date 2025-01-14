@@ -211,9 +211,9 @@ Distributed under the Apache-2.0 License. See `LICENSE.txt` for more information
 <!-- CONTACT -->
 ## Contact
 
-Kiril Talalaiko - 
+Kiril Talalaiko - [Email](kiriltalalayko@gmail.com) 
+
 [Youtube @ervette](https://www.youtube.com/@ervette)
-[Email] kiriltalalayko@gmail.com
 
 Project Link: [here](https://github.com/ervette/pos)
 
