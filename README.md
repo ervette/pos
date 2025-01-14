@@ -1,8 +1,3 @@
-# POS (Point of Sale) by Kiril Talalaiko
-
-The Project aims to evaluate and optimise cloud-based POS systems by conducting a detailed comparative analysis against on-premises systems. This dissertation focuses on measuring main performance, scalability, fault-tolerance and security, as well as the implementation of advanced technologies such as machine learning and IoT to improve POS systems’ capabilities. The milestone for the project itself is to research the advantages and insights between different systems to conclude how to enhance current POS systems. That will benefit business operations by highlighting the pros of existing system types and their vulnerabilities.
-
-
 <a id="readme-top"></a>
 
 <!-- PROJECT SHIELDS -->
@@ -29,7 +24,7 @@ The Project aims to evaluate and optimise cloud-based POS systems by conducting 
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
-  <h3 align="center">Best-README-Template</h3>
+  <h3 align="center">POS (Point of Sale) by Kiril Talalaiko</h3>
 
   <p align="center">
     An awesome README template to jumpstart your projects!
@@ -80,16 +75,17 @@ The Project aims to evaluate and optimise cloud-based POS systems by conducting 
 
 [![Product Name Screen Shot][product-screenshot]](https://example.com)
 
-There are many great README templates available on GitHub; however, I didn't find one that really suited my needs so I created this enhanced one. I want to create a README template so amazing that it'll be the last one you ever need -- I think this is it.
+There are many POS systems available—both cloud-based and on-premises—but few have been subjected to the comprehensive and rigorous evaluation this project demands. That’s why this initiative was undertaken: to methodically assess and optimize cloud-based POS systems through a detailed comparative analysis with traditional on-premises solutions.
 
-Here's why:
-* Your time should be focused on creating something amazing. A project that solves a problem and helps others
-* You shouldn't be doing the same tasks over and over like creating a README from scratch
-* You should implement DRY principles to the rest of your life :smile:
+Key focus areas include:
 
-Of course, no one template will serve all projects since your needs may be different. So I'll be adding more in the near future. You may also suggest changes by forking this repo and creating a pull request or opening an issue. Thanks to all the people have contributed to expanding this template!
+* Performance & Scalability: Measuring system speed and capacity to adapt as business demands grow.
+* Fault-Tolerance & Security: Ensuring systems are robust against failures and resistant to security threats.
+* Advanced Technology Integration: Evaluating the contribution of machine learning and IoT in enhancing system functionality.
 
-Use the `BLANK_README.md` to get started.
+The primary objective is to rigorously document the advantages and limitations of each system type, guiding improvements in current POS solutions. The insights gained will support business operations by clarifying where each system excels and where vulnerabilities exist.
+
+This work is intended for professionals seeking to elevate the reliability and efficiency of their POS systems through data-driven analysis and deliberate technological enhancements.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -211,9 +207,7 @@ Distributed under the Apache-2.0 License. See `LICENSE.txt` for more information
 <!-- CONTACT -->
 ## Contact
 
-Kiril Talalaiko - [Email](kiriltalalayko@gmail.com) 
-
-[Youtube @ervette](https://www.youtube.com/@ervette)
+Kiril Talalaiko - kiriltalalayko@gmail.com
 
 Project Link: [here](https://github.com/ervette/pos)
 
