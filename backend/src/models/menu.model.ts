@@ -6,22 +6,22 @@ interface IModifier {
 }
 
 interface IVariation {
-  type: string;       // e.g., "Bottle", "250ml"
-  price: number;      // Price for the variation
-  quantity: number;   // Inventory count for this variation
+  type: string;
+  price: number;
+  quantity: number;
 }
 
 interface IMenuItem {
-  name: string;         // Item name, e.g., "Pinot Grigio"
-  variations: IVariation[]; // List of variations with price and quantity
-  isAvailable: boolean; // Availability of the item
-  modifiers?: IModifier[]; // Optional modifiers like "Extra Cheese"
+  name: string;
+  variations: IVariation[];
+  isAvailable: boolean;
+  modifiers?: IModifier[];
 }
 
 interface IMenu extends Document {
-  superCategory: string;  // e.g., "Food", "Drinks"
-  subCategory: string;    // e.g., "Food/Main", "Drink/Wine"
-  items: IMenuItem[];     // List of menu items
+  superCategory: string;
+  subCategory: string;
+  items: IMenuItem[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -36,7 +36,7 @@ const MenuSchema = new Schema<IMenu>({
         {
           type: { type: String, required: true },
           price: { type: Number, required: true },
-          quantity: { type: Number, required: true, default: 0 }, // Add inventory tracking
+          quantity: { type: Number, required: true, default: 0 },
         },
       ],
       isAvailable: { type: Boolean, default: true },
@@ -51,6 +51,10 @@ const MenuSchema = new Schema<IMenu>({
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
+
+// Add Indexes
+MenuSchema.index({ superCategory: 1, subCategory: 1 }); // Compound index for categories
+MenuSchema.index({ "items.name": 1 }); // Index for item names
 
 const Menu = mongoose.model<IMenu>("Menu", MenuSchema);
 

@@ -38,6 +38,10 @@ const OrderSchema = new Schema<IOrder>({
   updatedAt: { type: Date, default: Date.now },
 });
 
+// Add Indexes
+OrderSchema.index({ tableNumber: 1 }); // Index for querying by table
+OrderSchema.index({ orderStatus: 1 }); // Index for filtering orders by status
+
 const Order = mongoose.model<IOrder>("Order", OrderSchema);
 
 export default Order;

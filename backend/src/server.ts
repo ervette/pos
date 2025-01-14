@@ -8,6 +8,7 @@ const Order = require("./models/order.model");
 
 import path from "path";
 import { Request, Response } from "express";
+import analyticsRoutes from "./routes/analytics.routes"
 
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
@@ -27,7 +28,7 @@ mongoose
   .catch((err: Error) => console.error("Database Connection Failed:", err.message));
 
 
-// Sample route
+// Routes
 app.get("/", (req: Request, res: Response) => {
   res.send("API is running...");
 });
@@ -35,6 +36,8 @@ app.get("/", (req: Request, res: Response) => {
 app.get("/api", (req: Request, res: Response) => {
     res.json({message: "Hello world!"});
 })
+
+app.use("/api/analytics", analyticsRoutes);
 
 const PORT = process.env.PORT || 5050;
 app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
