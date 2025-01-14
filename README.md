@@ -93,14 +93,13 @@ This work is intended for professionals seeking to elevate the reliability and e
 
 ### Built With
 
-This section should list any major frameworks/libraries used to bootstrap your project. Leave any add-ons/plugins for the acknowledgements section. Here are a few examples.
-
-* [![React][React.js]][React-url]
-* [![Node][Node.js]][Node-url]
-* [![Vite][Vite.js]][Vite-url]
-* [![MongoDB][MongoDB]][Mongo-url]
-* [![AWS][AWS]][AWS-url]
 * [![Bootstrap][Bootstrap.com]][Bootstrap-url]
+* [![MongoDB][MongoDB]][Mongo-url]
+* [![Node][Node.js]][Node-url]
+* [![React][React.js]][React-url]
+* [![Vite][Vite.js]][Vite-url]
+* [![AWS][AWS]][AWS-url]
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
