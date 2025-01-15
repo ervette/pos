@@ -1,0 +1,41 @@
+<svg width="210" height="210" viewBox="0 0 210 210" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="210" height="210" rx="50" fill="#F4F4F4"/>
+<line x1="5" y1="102.5" x2="65" y2="102.5" stroke="#212A2E" stroke-width="15"/>
+<line x1="130" y1="102.5" x2="193" y2="102.5" stroke="url(#paint0_linear_2_37)" stroke-width="15"/>
+<line x1="104.5" y1="17" x2="104.5" y2="82" stroke="#212A2E" stroke-width="15"/>
+<line x1="104.5" y1="129" x2="104.5" y2="194" stroke="url(#paint1_linear_2_37)" stroke-width="15"/>
+<line x1="72.5" y1="67" x2="72.5" y2="143" stroke="#212A2E" stroke-width="15"/>
+<line x1="137.5" y1="67" x2="137.5" y2="143" stroke="#212A2E" stroke-width="15"/>
+<line x1="132.5" y1="141" x2="132.5" y2="158" stroke="#212A2E" stroke-width="5"/>
+<line x1="132.5" y1="52" x2="132.5" y2="69" stroke="#212A2E" stroke-width="5"/>
+<line x1="77.5" y1="52" x2="77.5" y2="69" stroke="#212A2E" stroke-width="5"/>
+<line x1="72" y1="74.5" x2="55" y2="74.5" stroke="#212A2E" stroke-width="5"/>
+<line x1="55" y1="135.5" x2="72" y2="135.5" stroke="#212A2E" stroke-width="5"/>
+<line x1="138" y1="135.5" x2="155" y2="135.5" stroke="#212A2E" stroke-width="5"/>
+<line x1="138" y1="74.5" x2="155" y2="74.5" stroke="#212A2E" stroke-width="5"/>
+<line x1="77.5" y1="141" x2="77.5" y2="158" stroke="#212A2E" stroke-width="5"/>
+<circle cx="155" cy="52" r="19" stroke="#212A2E" stroke-width="12"/>
+<circle cx="105" cy="105" r="10" fill="#212A2E"/>
+<circle cx="155" cy="158" r="19" stroke="#212A2E" stroke-width="12"/>
+<circle cx="55" cy="158" r="19" stroke="#212A2E" stroke-width="12"/>
+<circle cx="55" cy="52" r="19" stroke="#212A2E" stroke-width="12"/>
+<rect x="11" y="11" width="188" height="188" rx="39" stroke="url(#paint2_linear_2_37)" stroke-width="12"/>
+<rect x="56" y="145" width="12" height="12" fill="#F4F4F4"/>
+<rect x="56" y="53" width="12" height="12" fill="#F4F4F4"/>
+<rect x="142" y="53" width="12" height="12" fill="#F4F4F4"/>
+<rect x="142" y="145" width="12" height="12" fill="#F4F4F4"/>
+<defs>
+<linearGradient id="paint0_linear_2_37" x1="130" y1="110.5" x2="193" y2="110.5" gradientUnits="userSpaceOnUse">
+<stop offset="0.494388" stop-color="#212A2E"/>
+<stop offset="1" stop-color="#00BBFF"/>
+</linearGradient>
+<linearGradient id="paint1_linear_2_37" x1="96.5" y1="129" x2="96.5" y2="194" gradientUnits="userSpaceOnUse">
+<stop offset="0.498877" stop-color="#212A2E"/>
+<stop offset="1" stop-color="#00BBFF"/>
+</linearGradient>
+<linearGradient id="paint2_linear_2_37" x1="5" y1="5" x2="205" y2="205" gradientUnits="userSpaceOnUse">
+<stop offset="0.5" stop-color="#212A2E"/>
+<stop offset="1" stop-color="#39C7FF"/>
+</linearGradient>
+</defs>
+</svg>
