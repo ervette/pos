@@ -1,11 +1,11 @@
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
-const express = require("express");
-const cors = require("cors");
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import express from "express";
+import cors from "cors";
 
-const Config = require("./models/config.model");
-const Menu = require("./models/menu.model");
-const Order = require("./models/order.model");
+// const Config = require("./models/config.model");
+// const Menu = require("./models/menu.model");
+// const Order = require("./models/order.model");
 
 import path from "path";
 import { Request, Response } from "express";
@@ -13,11 +13,10 @@ import analyticsRoutes from "./routes/analytics.routes";
 import menuRoutes from "./routes/menu.routes";
 import orderRoutes from "./routes/order.routes";
 import configRoutes from "./routes/config.routes";
+import syncRoutes from "./routes/sync.routes";
 
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
-
-console.log(process.env.MONGO_URI);
 
 const app = express();
 
@@ -27,7 +26,7 @@ app.use(cors());
 
 // Connect to MongoDB Atlas
 mongoose
-  .connect(process.env.MONGO_URI || "mongodb://localhost:27017/pos", { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(process.env.MONGO_URI || "mongodb://localhost:27017/pos")
   .then(() => console.log("MongoDB Connected"))
   .catch((err: Error) => console.error("Database Connection Failed:", err.message));
 
@@ -45,6 +44,7 @@ app.use("/api/analytics", analyticsRoutes);
 app.use("/api/menu", menuRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/config", configRoutes);
+app.use("/api/sync", syncRoutes);
 
 const PORT = process.env.PORT || 5050;
 app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
