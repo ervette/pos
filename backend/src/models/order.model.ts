@@ -1,51 +1,42 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-// Interface for individual items in an order
 interface IOrderItem {
-  itemId: mongoose.Types.ObjectId; // Reference to the Menu schema
-  name: string;                   // Item name (e.g., "Pinot Grigio")
-  variation: string;              // Variation type (e.g., "Bottle", "250ml")
-  price: number;                  // Price of the variation
-  quantity: number;               // Quantity ordered
-  notes?: string;                 // Special instructions or notes
+  itemId: mongoose.Types.ObjectId;
+  name: string;
+  variation: string;
+  price: number;
+  quantity: number;
+  notes?: string;
 }
 
-// Interface for the Order document
 interface IOrder extends Document {
-  tableNumber?: number;           // Table number (optional for takeout orders)
-  items: IOrderItem[];            // List of ordered items
-  totalPrice: number;             // Total order price
-  orderStatus: "open" | "completed" | "cancelled"; // Status of the order
-  createdAt: Date;                // Timestamp for order creation
-  updatedAt: Date;                // Timestamp for last update
+  orderId: string;
+  tableNumber?: number;
+  items: IOrderItem[];
+  totalPrice: number;
+  orderStatus: "open" | "completed" | "cancelled";
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-// Schema for individual items in an order
-const OrderItemSchema = new Schema<IOrderItem>({
-  itemId: { type: Schema.Types.ObjectId, ref: "Menu", required: true },
-  name: { type: String, required: true },
-  variation: { type: String, required: true },
-  price: { type: Number, required: true },
-  quantity: { type: Number, required: true },
-  notes: { type: String },
-});
-
-// Schema for the entire order
+// ✅ Add unique index constraint: Only ONE open order per tableNumber
 const OrderSchema = new Schema<IOrder>(
   {
-    tableNumber: { type: Number }, // Optional for takeout
-    items: [OrderItemSchema], // Array of order items
-    totalPrice: { type: Number, required: true, min: 0 }, // Ensure non-negative total
+    orderId: { type: String, unique: true, required: true, default: () => new mongoose.Types.ObjectId().toString() }, // ✅ Ensure orderId is unique
+    tableNumber: { type: Number, required: true, index: true }, 
+    items: [{ type: Object, required: true }],
+    totalPrice: { type: Number, required: true, min: 0 },
     orderStatus: {
       type: String,
-      enum: ["open", "completed", "cancelled"], // Enum for valid statuses
+      enum: ["open", "completed", "cancelled"],
       default: "open",
     },
   },
-  { timestamps: true } // Automatically add createdAt and updatedAt fields
+  { timestamps: true }
 );
 
-// Create and export the Order model
-const Order = mongoose.model<IOrder>("Order", OrderSchema);
+// ✅ Prevent multiple open orders for the same tableNumber
+OrderSchema.index({ tableNumber: 1, orderStatus: 1 }, { unique: true, partialFilterExpression: { orderStatus: "open" } });
 
+const Order = mongoose.model<IOrder>("Order", OrderSchema);
 export default Order;

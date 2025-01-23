@@ -1,78 +1,182 @@
-import db from "../localdb/index"; // Import Dexie instance
-import { addToSyncQueue } from "../localdb/syncQueue"; // Import sync queue helper
-import { Order } from "../localdb/index"; // Import Order interface
+import db from "../localdb/index"; 
+import { addToSyncQueue, getSyncQueue } from "../localdb/syncQueue"; 
+import { Order } from "../localdb/index"; 
 
-// Function to handle order submission (online and offline)
+// ✅ Handle Order Submission (Works Online and Offline)
 export const handleOrderSubmission = async (orderData: Order): Promise<void> => {
-  if (navigator.onLine) {
-    // Online Mode: Send order to backend
     try {
-      const response = await fetch("http://localhost:5050/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(orderData),
-      });
+        // ✅ Ensure orderId is always present
+        if (!orderData.orderId) {
+            orderData.orderId = crypto.randomUUID();
+        }
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Order successfully saved to backend:", data);
-      } else {
-        throw new Error(`Failed to save order to backend: ${response.statusText}`);
-      }
+        // ✅ Check if order already exists in IndexedDB (avoid duplicate saves)
+        const existingOrder = await db.table("orders")
+            .where("orderId").equals(orderData.orderId)
+            .first();
+
+        if (existingOrder) {
+            console.warn("Duplicate order detected, skipping save:", orderData.orderId);
+            return;
+        }
+
+        if (navigator.onLine) {
+            await submitOrderToBackend(orderData);
+        } else {
+            console.warn("Offline: Saving order locally.");
+            await saveOrderOffline(orderData);
+        }
     } catch (error) {
-      console.error("Error saving order online. Saving locally instead:", error);
-      await saveOrderOffline(orderData); // Fallback to offline storage
+        console.error("Error processing order:", error);
     }
-  } else {
-    // Offline Mode: Save locally
-    console.warn("Offline: Saving order locally");
-    await saveOrderOffline(orderData);
-  }
 };
 
-// Save order to IndexedDB and queue for sync
+// ✅ Send Order to Backend
+const submitOrderToBackend = async (orderData: Order): Promise<void> => {
+    try {
+        const response = await fetch("http://localhost:5050/api/orders", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(orderData),
+        });
+
+        if (response.ok) {
+            console.log("Order successfully saved to backend.");
+        } else {
+            throw new Error(`Failed to save order: ${response.statusText}`);
+        }
+    } catch (error) {
+        console.warn("Failed to sync order, saving locally.", error);
+        await saveOrderOffline(orderData);
+    }
+};
+
+// ✅ Save Order to IndexedDB & Queue for Sync
 const saveOrderOffline = async (orderData: Order): Promise<void> => {
-  try {
-    // Save order locally in the orders table
-    const localId = await db.table("orders").add(orderData);
-    console.log(`Order saved locally with ID: ${localId}`);
+    try {
+        // ✅ Ensure orderId is defined before querying IndexedDB
+        if (!orderData.orderId) {
+            throw new Error("Missing orderId for offline order.");
+        }
 
-    // Add order to the sync queue for later synchronization
-    await addToSyncQueue("addOrder", orderData);
-    console.log("Order added to sync queue for synchronization");
-  } catch (error) {
-    console.error("Failed to save order locally:", error);
-  }
+        // ✅ Check if order exists in IndexedDB
+        const existingOrder = await db.table("orders")
+            .where("orderId").equals(orderData.orderId)
+            .first();
+        
+        if (existingOrder) {
+            console.warn("Duplicate order detected, skipping save:", orderData.orderId);
+            return;
+        }
+
+        // ✅ Add order to IndexedDB
+        const localId = await db.table("orders").add(orderData);
+        if (typeof localId !== "number") {
+            throw new Error(`Invalid ID returned by IndexedDB: ${localId}`);
+        }
+
+        console.log(`Order saved locally with ID: ${localId}`);
+
+        // ✅ Check if order is already in syncQueue before adding
+        const existingQueueItem = await db.table("syncQueue")
+            .where("data.orderId").equals(orderData.orderId)
+            .first();
+        
+        if (!existingQueueItem) {
+            await addToSyncQueue("addOrder", { ...orderData, id: localId });
+            console.log("Order added to sync queue.");
+        } else {
+            console.warn("Order already in sync queue, skipping add:", orderData.orderId);
+        }
+    } catch (error) {
+        console.error("Failed to save order offline:", error);
+    }
 };
 
-// Sync offline data to backend
+// ✅ Sync Offline Orders with Backend
 export const syncOfflineData = async (): Promise<void> => {
     try {
-      const syncQueue = await db.table("syncQueue").toArray();
-  
-      for (const record of syncQueue) {
-        try {
-          if (record.operation === "addOrder") {
-            const response = await fetch("http://localhost:5050/api/orders", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(record.data),
-            });
-  
-            if (response.ok) {
-              console.log("Order synced successfully:", record.data);
-              // Remove the synced record from the queue
-              await db.table("syncQueue").delete(record.id);
-            } else {
-              console.error("Failed to sync order:", response.statusText);
+        const syncQueue = await getSyncQueue();
+
+        for (const record of syncQueue) {
+            try {
+                let response;
+
+                // ✅ Ensure record.data.orderId is valid before making requests
+                if (!record.data.orderId) {
+                    console.warn("Skipping record due to missing orderId:", record);
+                    continue;
+                }
+
+                // ✅ Check if the order already exists in MongoDB
+                const checkOrder = await fetch(`http://localhost:5050/api/orders/${record.data.orderId}`);
+
+                if (checkOrder.ok) {
+                    console.warn("Order already exists in backend, updating instead of re-adding:", record.data.orderId);
+                    
+                    await fetch(`http://localhost:5050/api/orders/${record.data.orderId}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(record.data),
+                    });
+
+                    // ✅ Ensure ID exists before deleting from syncQueue
+                    if (typeof record.id !== "undefined") {
+                        await db.table("syncQueue").delete(record.id);
+                    } else {
+                        console.warn("Skipping deletion from syncQueue: Missing ID", record);
+                    }
+                    continue;
+                }
+
+                // ✅ Process Sync Based on Operation Type
+                if (record.operation === "addOrder") {
+                    response = await fetch("http://localhost:5050/api/orders", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(record.data),
+                    });
+                } else if (record.operation === "updateOrder") {
+                    response = await fetch(`http://localhost:5050/api/orders/${record.data.orderId}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(record.data),
+                    });
+                } else if (record.operation === "deleteOrder") {
+                    response = await fetch(`http://localhost:5050/api/orders/${record.data.orderId}`, {
+                        method: "DELETE",
+                    });
+                }
+
+                // ✅ Step 3: Handle Sync Response
+                if (response?.ok) {
+                    console.log("Sync successful:", record);
+
+                    // ✅ Ensure ID exists before deleting from syncQueue
+                    if (typeof record.id !== "undefined") {
+                        await db.table("syncQueue").delete(record.id);
+                    } else {
+                        console.warn("Skipping deletion from syncQueue: Missing ID", record);
+                    }
+
+                    // ✅ Ensure record.data.id exists before deleting from orders table
+                    if (typeof record.data.id !== "undefined") {
+                        await db.table("orders").delete(record.data.id);
+                    } else {
+                        console.warn("Skipping deletion from orders table: Missing ID", record);
+                    }
+                } else {
+                    console.error("Failed to sync order:", response?.statusText);
+                }
+            } catch (error) {
+                console.error("Sync error:", error);
             }
-          }
-        } catch (error) {
-          console.error("Sync error:", record, error);
-          // Do not remove the record if syncing fails
         }
-      }
     } catch (error) {
-      console.error("Error fetching sync queue:", error);
+        console.error("Error fetching sync queue:", error);
     }
-  };
+};
+
+
+// ✅ Automatically trigger sync when going online
+window.addEventListener("online", syncOfflineData);

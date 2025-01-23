@@ -9,11 +9,17 @@ import {
 
 const router = express.Router();
 
+const asyncHandler =
+  (fn: (req: express.Request, res: express.Response) => Promise<express.Response | void>) =>
+  (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    fn(req, res).catch(next);
+  };
+
 // CRUD endpoints for orders
-router.post("/", createOrder); // Create
-router.get("/", getAllOrders); // Read (all)
-router.get("/:id", getOrderById); // Read (specific order)
-router.put("/:id", updateOrder); // Update
-router.delete("/:id", deleteOrder); // Delete
+router.post("/", asyncHandler(createOrder)); // Create
+router.get("/", asyncHandler(getAllOrders)); // Read (all)
+router.get("/:id", asyncHandler(getOrderById)); // Read (specific order)
+router.put("/:id", asyncHandler(updateOrder)); // Update
+router.delete("/:id", asyncHandler(deleteOrder)); // Delete
 
 export default router;
