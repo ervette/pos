@@ -6,42 +6,37 @@ interface IOrderItem {
   variation: string;
   price: number;
   quantity: number;
-  totalItemPrice: number;
   notes?: string;
 }
 
 interface IOrder extends Document {
-  tableNumber: number;
+  orderId: string;
+  tableNumber?: number;
   items: IOrderItem[];
   totalPrice: number;
-  orderStatus: "open" | "paid" | "cancelled";
+  orderStatus: "open" | "completed" | "cancelled";
   createdAt: Date;
   updatedAt: Date;
 }
 
-const OrderSchema = new Schema<IOrder>({
-  tableNumber: { type: Number, required: true },
-  items: [
-    {
-      itemId: { type: Schema.Types.ObjectId, ref: "Menu", required: true },
-      name: { type: String, required: true },
-      variation: { type: String, required: true },
-      price: { type: Number, required: true },
-      quantity: { type: Number, required: true },
-      totalItemPrice: { type: Number, required: true },
-      notes: { type: String, default: "" },
+// ✅ Add unique index constraint: Only ONE open order per tableNumber
+const OrderSchema = new Schema<IOrder>(
+  {
+    orderId: { type: String, unique: true, required: true, default: () => new mongoose.Types.ObjectId().toString() }, // ✅ Ensure orderId is unique
+    tableNumber: { type: Number, required: true, index: true }, 
+    items: [{ type: Object, required: true }],
+    totalPrice: { type: Number, required: true, min: 0 },
+    orderStatus: {
+      type: String,
+      enum: ["open", "completed", "cancelled"],
+      default: "open",
     },
-  ],
-  totalPrice: { type: Number, required: true },
-  orderStatus: { type: String, enum: ["open", "paid", "cancelled"], default: "open" },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-});
+  },
+  { timestamps: true }
+);
 
-// Add Indexes
-OrderSchema.index({ tableNumber: 1 }); // Index for querying by table
-OrderSchema.index({ orderStatus: 1 }); // Index for filtering orders by status
+// ✅ Prevent multiple open orders for the same tableNumber
+OrderSchema.index({ tableNumber: 1, orderStatus: 1 }, { unique: true, partialFilterExpression: { orderStatus: "open" } });
 
 const Order = mongoose.model<IOrder>("Order", OrderSchema);
-
 export default Order;

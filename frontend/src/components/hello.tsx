@@ -1,12 +1,12 @@
-import React, { useEffect } from "react";
-import { fetchHelloWorld } from "../services/api";
+import React from "react"
 
 const Hello: React.FC = () => {
-  useEffect(() => {
-    fetchHelloWorld(); // Fetches "Hello World" on component mount
-  }, []);
+  return (
+    <div>
+      <h1>HostIQ</h1>
+      <img src="/icon.svg" alt="some"></img>
+    </div>
+  )
+}
 
-  return <div>Hello from React Frontend</div>;
-};
-
-export default Hello;
+export default Hello
