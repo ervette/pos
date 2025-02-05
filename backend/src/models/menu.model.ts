@@ -36,7 +36,7 @@ const MenuSchema = new Schema<IMenu>({
         {
           type: { type: String, required: true },
           price: { type: Number, required: true },
-          quantity: { type: Number, required: true, default: 0 },
+          quantity: { type: Number, required: false, default: 0 },
         },
       ],
       isAvailable: { type: Boolean, default: true },
