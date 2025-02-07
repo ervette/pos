@@ -22,7 +22,8 @@ const db = new Dexie("POSDB");
 db.version(1).stores({
   orders: "++id, orderId, tableNumber, items, totalPrice, orderStatus, createdAt",
   syncQueue: "++id, operation, data, data.orderId",
-  menu: "++id, superCategory, subCategory, items", // Store menu items
+  menu: "++id, superCategory, subCategory, items",
+  config: "++id", 
 });
 
 export default db;
