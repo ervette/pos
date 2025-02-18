@@ -1,6 +1,6 @@
-import React from "react";
-import LogoHeader from "../components/LogoHeader"; // Reusing our header
-import "../styles/Dashboard.css";
+import React from "react"
+import LogoHeader from "../components/LogoHeader" // Reusing our header
+import "../styles/Dashboard.css"
 import {
   BarChart,
   Bar,
@@ -8,18 +8,33 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-} from "recharts";
+} from "recharts"
 
 const Dashboard: React.FC = () => {
   // Mock Data for Sales & Chart
   const salesData = [
-    { label: "Today's Sales", amount: "£2351.33", change: "Up 17%", positive: true },
-    { label: "Weekly Sales", amount: "£22784.49", change: "Down 3%", positive: false },
-    { label: "Monthly Sales", amount: "£158009.20", change: "Down 2%", positive: false },
-  ];
+    {
+      label: "Today's Sales",
+      amount: "£2351.33",
+      change: "Up 17%",
+      positive: true,
+    },
+    {
+      label: "Weekly Sales",
+      amount: "£22784.49",
+      change: "Down 3%",
+      positive: false,
+    },
+    {
+      label: "Monthly Sales",
+      amount: "£158009.20",
+      change: "Down 2%",
+      positive: false,
+    },
+  ]
 
   const workloadData = [
-    { hour: "12", value: 5 },
+    { hour: "12", value: 1 },
     { hour: "13", value: 7 },
     { hour: "14", value: 10 },
     { hour: "15", value: 8 },
@@ -31,8 +46,8 @@ const Dashboard: React.FC = () => {
     { hour: "21", value: 8 },
     { hour: "22", value: 5 },
     { hour: "23", value: 3 },
-    { hour: "24", value: 1 },
-  ];
+    { hour: "24", value: 0 },
+  ]
 
   const topItemsData = [
     { name: "Corona", count: 25 },
@@ -40,7 +55,7 @@ const Dashboard: React.FC = () => {
     { name: "Burger", count: 15 },
     { name: "Pizza", count: 15 },
     { name: "Chips", count: 13 },
-  ];
+  ]
 
   return (
     <div className="dashboard-container">
@@ -56,7 +71,11 @@ const Dashboard: React.FC = () => {
           <div key={index} className="sales-card">
             <p className="sales-label">{sale.label}</p>
             <p className="sales-amount">{sale.amount}</p>
-            <p className={`sales-change ${sale.positive ? "positive" : "negative"}`}>
+            <p
+              className={`sales-change ${
+                sale.positive ? "positive" : "negative"
+              }`}
+            >
               {sale.positive ? "↑" : "↓"} {sale.change}
             </p>
           </div>
@@ -85,7 +104,12 @@ const Dashboard: React.FC = () => {
           <ResponsiveContainer width="100%" height={200}>
             <BarChart layout="vertical" data={topItemsData}>
               <XAxis type="number" />
-              <YAxis dataKey="name" type="category" width={100} tick={{ fill: "#FFFFFF" }} />
+              <YAxis
+                dataKey="name"
+                type="category"
+                width={100}
+                tick={{ fill: "#FFFFFF" }}
+              />
               <Tooltip />
               {/* Removed horizontal grid lines */}
               <Bar dataKey="count" fill="#4ab3ff" />
@@ -94,7 +118,7 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Dashboard;
+export default Dashboard
