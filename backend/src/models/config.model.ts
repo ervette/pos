@@ -1,32 +1,29 @@
 import mongoose, { Schema, Document } from "mongoose";
+import bcrypt from "bcryptjs";
 
 interface IUser {
-  username: string; // Username
-  password: string; // Hashed password (for security, store hashed passwords)
+  username: string;
+  password: string;
 }
 
 interface IConfiguration extends Document {
-  currency: "USD" | "GBP" | "EUR";    // Currency setting
-  tables: number[];                   // List of table numbers
+  currency: "USD" | "GBP" | "EUR";
+  tables: number[];
   printer: {
-    ip: string;                       // Printer IP address
-    port: number;                     // Printer port
-    enabled: boolean;                 // Whether printing is enabled
+    ip: string;
+    port: number;
+    enabled: boolean;
   };
-  theme: "light" | "dark" | "system"; // App appearance
-  language: string;                   // Language code (ISO 639-1)
-  timezone: string;                   // Timezone identifier
-  orderPrefix: string;                // Prefix for order IDs
-  nextOrderNumber: number;            // Next order ID number
-  serviceChargeRate: number;          // Service charge rate (percentage)
-  users: IUser[];                     // ✅ Array of users (username & password)
+  theme: "light" | "dark" | "system";
+  language: string;
+  timezone: string;
+  orderPrefix: string;
+  nextOrderNumber: number;
+  serviceChargeRate: number;
+  users: IUser[];
 }
 
-const UserSchema = new Schema<IUser>({
-  username: { type: String, required: true, unique: true }, // Unique username
-  password: { type: String, required: true }, // Store as a hashed password
-});
-
+// Schema definition
 const ConfigSchema = new Schema<IConfiguration>({
   currency: { type: String, enum: ["USD", "GBP", "EUR"], default: "USD" },
   tables: { type: [Number], default: [] },
@@ -41,9 +38,25 @@ const ConfigSchema = new Schema<IConfiguration>({
   orderPrefix: { type: String, default: "ORD-" },
   nextOrderNumber: { type: Number, default: 1 },
   serviceChargeRate: { type: Number, default: 0 },
-  users: { type: [UserSchema], default: [] }, // ✅ Add user schema array
+
+  // ✅ Ensure usernames are stored properly
+  users: [
+    {
+      username: { type: String, required: true },  
+      password: { type: String, required: true },
+    },
+  ],
+});
+
+
+// Hash passwords before saving
+ConfigSchema.pre("save", async function (next) {
+  if (!this.isModified("users")) return next();
+  for (const user of this.users) {
+    user.password = await bcrypt.hash(user.password, 10);
+  }
+  next();
 });
 
 const Config = mongoose.model<IConfiguration>("Config", ConfigSchema);
-
 export default Config;
