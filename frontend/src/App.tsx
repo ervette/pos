@@ -1,7 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import Login from "./components/Login"
 import PrivateRoute from "./components/PrivateRoute"
-import Hello from "./components/hello"
+import Dashboard from "./components/Dashboard"
+// import Hello from "./components/hello"
 
 function App() {
   return (
@@ -12,10 +13,7 @@ function App() {
           path="/"
           element={
             <PrivateRoute>
-              <div>
-                <Hello />
-                You are In
-              </div>
+              <Dashboard />
             </PrivateRoute>
           }
         />
