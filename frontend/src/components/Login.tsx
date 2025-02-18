@@ -14,7 +14,7 @@ const Login = () => {
     e.preventDefault()
     try {
       await login(username, password)
-      navigate("/dashboard")
+      navigate("/")
     } catch (err) {
       setError("Invalid credentials")
       console.log(err)
