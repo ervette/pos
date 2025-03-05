@@ -1,86 +1,127 @@
 import Order from "../models/order.model";
-import Menu from "../models/menu.model";
+
+interface SalesReport {
+  todaySales: number;
+  weeklySales: number;
+  monthlySales: number;
+  weeklyChange: number;
+  monthlyChange: number;
+}
+
+interface WorkloadData {
+  hour: number;
+  count: number;
+}
+
+interface PopularItem {
+  name: string;
+  count: number;
+}
 
 /**
- * Get total sales grouped by superCategory.
+ * Get sales report including daily, weekly, and monthly sales.
  */
-export const getTotalSalesByCategory = async (): Promise<any> => {
-  return await Order.aggregate([
-    { $unwind: "$items" }, // Flatten items array
-    {
-      $lookup: {
-        from: "menus",
-        localField: "items.itemId",
-        foreignField: "_id",
-        as: "menuItem",
+export const getSalesReport = async (): Promise<SalesReport> => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const startOfWeek = new Date(today);
+  startOfWeek.setDate(today.getDate() - today.getDay()); // Start of the week (Sunday)
+
+  const startOfMonth = new Date(today);
+  startOfMonth.setDate(1); // First day of the month
+
+  // Utility function to get total sales for a date range
+  const getTotalSales = async (startDate: Date, endDate: Date): Promise<number> => {
+    const result = await Order.aggregate([
+      { 
+        $match: { 
+          createdAt: { $gte: startDate, $lte: endDate }, 
+          orderStatus: "completed" // ✅ Only count completed orders
+        } 
       },
-    },
-    { $unwind: "$menuItem" }, // Flatten menuItem array
-    {
-      $group: {
-        _id: "$menuItem.superCategory",
-        totalSales: { $sum: "$items.totalItemPrice" },
+      { $unwind: "$items" }, // Flatten items array
+      {
+        $group: {
+          _id: null,
+          totalSales: { $sum: "$totalPrice" }, // Sum item prices
+        },
       },
-    },
-    { $sort: { totalSales: -1 } },
+      { $project: { _id: 0, totalSales: 1 } },
+    ]);
+
+    return result.length > 0 ? result[0].totalSales : 0;
+  };
+
+  // Get total sales for today, this week, and this month
+  const [todaySales, weeklySales, monthlySales] = await Promise.all([
+    getTotalSales(today, new Date()),
+    getTotalSales(startOfWeek, new Date()),
+    getTotalSales(startOfMonth, new Date()),
   ]);
+
+  // Get sales for the previous week and month for comparison
+  const previousWeekStart = new Date(startOfWeek);
+  previousWeekStart.setDate(previousWeekStart.getDate() - 7);
+
+  const previousMonthStart = new Date(startOfMonth);
+  previousMonthStart.setMonth(previousMonthStart.getMonth() - 1);
+
+  const previousWeekSales = await getTotalSales(previousWeekStart, startOfWeek);
+  const previousMonthSales = await getTotalSales(previousMonthStart, startOfMonth);
+
+  return {
+    todaySales,
+    weeklySales,
+    monthlySales,
+    weeklyChange: previousWeekSales ? ((weeklySales - previousWeekSales) / previousWeekSales) * 100 : 0,
+    monthlyChange: previousMonthSales ? ((monthlySales - previousMonthSales) / previousMonthSales) * 100 : 0,
+  };
 };
 
 /**
- * Get daily sales report.
+ * Get sales grouped by hour for workload visualization.
  */
-export const getDailySales = async (date: Date): Promise<any> => {
-  const startOfDay = new Date(date);
-  startOfDay.setHours(0, 0, 0, 0);
-
-  const endOfDay = new Date(startOfDay);
-  endOfDay.setHours(23, 59, 59, 999);
-
+export const getHourlyWorkload = async (): Promise<WorkloadData[]> => {
   return await Order.aggregate([
-    { $match: { createdAt: { $gte: startOfDay, $lte: endOfDay } } },
     { $unwind: "$items" },
     {
       $group: {
-        _id: null,
-        totalSales: { $sum: "$items.totalItemPrice" },
+        _id: { $hour: "$createdAt" },
+        count: { $sum: 1 },
       },
     },
-    { $project: { _id: 0, totalSales: 1 } },
-  ]);
-};
-
-/**
- * Get low-stock items.
- */
-export const getLowStockItems = async (threshold: number): Promise<any> => {
-  return await Menu.aggregate([
-    { $unwind: "$items" },
-    { $unwind: "$items.variations" },
-    { $match: { "items.variations.quantity": { $lt: threshold } } },
+    { $sort: { _id: 1 } },
     {
       $project: {
-        name: "$items.name",
-        variation: "$items.variations.type",
-        quantity: "$items.variations.quantity",
+        hour: "$_id",
+        count: 1,
+        _id: 0,
       },
     },
-    { $sort: { quantity: 1 } },
   ]);
 };
 
 /**
  * Get most popular items by order count.
  */
-export const getPopularItems = async (): Promise<any> => {
+export const getPopularItems = async (): Promise<PopularItem[]> => {
   return await Order.aggregate([
     { $unwind: "$items" },
     {
       $group: {
         _id: "$items.name",
-        orderCount: { $sum: 1 },
+        count: { $sum: 1 },
       },
     },
-    { $sort: { orderCount: -1 } },
-    { $limit: 10 }, // Top 10 popular items
+    { $sort: { count: -1 } },
+    { $limit: 10 },
+    {
+      $project: {
+        name: "$_id",
+        count: 1,
+        _id: 0,
+      },
+    },
   ]);
 };

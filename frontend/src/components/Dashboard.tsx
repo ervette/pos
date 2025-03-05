@@ -1,6 +1,14 @@
-import React from "react"
-import LogoHeader from "../components/LogoHeader" // Reusing our header
+import React, { useState, useEffect } from "react"
+import LogoHeader from "../components/LogoHeader"
 import "../styles/Dashboard.css"
+import {
+  fetchSalesData,
+  fetchWorkloadData,
+  fetchPopularItems,
+  SalesData,
+  WorkloadData,
+  PopularItem,
+} from "../services/dashboard.service"
 import {
   BarChart,
   Bar,
@@ -11,55 +19,41 @@ import {
 } from "recharts"
 
 const Dashboard: React.FC = () => {
-  // Mock Data for Sales & Chart
-  const salesData = [
-    {
-      label: "Today's Sales",
-      amount: "£2351.33",
-      change: "Up 17%",
-      positive: true,
-    },
-    {
-      label: "Weekly Sales",
-      amount: "£22784.49",
-      change: "Down 3%",
-      positive: false,
-    },
-    {
-      label: "Monthly Sales",
-      amount: "£158009.20",
-      change: "Down 2%",
-      positive: false,
-    },
-  ]
+  // State Management
+  const [salesData, setSalesData] = useState<SalesData | null>(null)
+  const [workloadData, setWorkloadData] = useState<WorkloadData[]>([])
+  const [topItems, setTopItems] = useState<PopularItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const workloadData = [
-    { hour: "12", value: 1 },
-    { hour: "13", value: 7 },
-    { hour: "14", value: 10 },
-    { hour: "15", value: 8 },
-    { hour: "16", value: 15 },
-    { hour: "17", value: 20 },
-    { hour: "18", value: 20 },
-    { hour: "19", value: 12 },
-    { hour: "20", value: 16 },
-    { hour: "21", value: 8 },
-    { hour: "22", value: 5 },
-    { hour: "23", value: 3 },
-    { hour: "24", value: 0 },
-  ]
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      setLoading(true)
+      try {
+        const [sales, workload, popularItems] = await Promise.all([
+          fetchSalesData(),
+          fetchWorkloadData(),
+          fetchPopularItems(),
+        ])
 
-  const topItemsData = [
-    { name: "Corona", count: 25 },
-    { name: "House Wine 250ml", count: 19 },
-    { name: "Burger", count: 15 },
-    { name: "Pizza", count: 15 },
-    { name: "Chips", count: 13 },
-  ]
+        setSalesData(sales)
+        setWorkloadData(workload)
+        setTopItems(popularItems)
+      } catch (err) {
+        console.error("Failed to load data:", err)
+        setError("Failed to load data.")
+      }
+      setLoading(false)
+    }
+
+    loadDashboardData()
+  }, [])
+
+  if (loading) return <p className="loading">Loading...</p>
+  if (error) return <p className="error">{error}</p>
 
   return (
     <div className="dashboard-container">
-      {/* Header - Align Logo and Dashboard Title */}
       <div className="dashboard-header">
         <LogoHeader />
         <h1 className="dashboard-title">Dashboard</h1>
@@ -67,24 +61,60 @@ const Dashboard: React.FC = () => {
 
       {/* Sales Cards */}
       <div className="sales-container">
-        {salesData.map((sale, index) => (
-          <div key={index} className="sales-card">
-            <p className="sales-label">{sale.label}</p>
-            <p className="sales-amount">{sale.amount}</p>
-            <p
-              className={`sales-change ${
-                sale.positive ? "positive" : "negative"
-              }`}
-            >
-              {sale.positive ? "↑" : "↓"} {sale.change}
-            </p>
-          </div>
-        ))}
+        <div className="sales-card">
+          <p className="sales-label">Today's Sales</p>
+          <p className="sales-amount">
+            £{salesData?.todaySales?.toFixed(2) ?? "0.00"}
+          </p>
+        </div>
+        <div className="sales-card">
+          <p className="sales-label">Weekly Sales</p>
+          <p className="sales-amount">
+            £{salesData?.weeklySales?.toFixed(2) ?? "0.00"}
+          </p>
+          <p
+            className={`sales-change ${
+              salesData?.weeklyChange && salesData.weeklyChange > 0
+                ? "positive"
+                : "negative"
+            }`}
+          >
+            {salesData?.weeklyChange !== undefined
+              ? salesData.weeklyChange > 0
+                ? "↑"
+                : "↓"
+              : ""}
+            {salesData?.weeklyChange !== undefined
+              ? ` ${Math.abs(salesData.weeklyChange).toFixed(1)}%`
+              : ""}
+          </p>
+        </div>
+        <div className="sales-card">
+          <p className="sales-label">Monthly Sales</p>
+          <p className="sales-amount">
+            £{salesData?.monthlySales?.toFixed(2) ?? "0.00"}
+          </p>
+          <p
+            className={`sales-change ${
+              salesData?.monthlyChange && salesData.monthlyChange > 0
+                ? "positive"
+                : "negative"
+            }`}
+          >
+            {salesData?.monthlyChange !== undefined
+              ? salesData.monthlyChange > 0
+                ? "↑"
+                : "↓"
+              : ""}
+            {salesData?.monthlyChange !== undefined
+              ? ` ${Math.abs(salesData.monthlyChange).toFixed(1)}%`
+              : ""}
+          </p>
+        </div>
       </div>
 
-      {/* Workload Chart & Top Items */}
+      {/* Charts */}
       <div className="dashboard-content">
-        {/* Workload Chart */}
         <div className="chart-container">
           <p className="chart-title">Workload</p>
           <ResponsiveContainer width="100%" height={200}>
@@ -92,26 +122,22 @@ const Dashboard: React.FC = () => {
               <XAxis dataKey="hour" />
               <YAxis />
               <Tooltip />
-              {/* Removed vertical grid lines */}
-              <Bar dataKey="value" fill="#4ab3ff" />
+              <Bar dataKey="count" fill="#4ab3ff" />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Top Items Horizontal Bar Chart */}
         <div className="top-items-container">
           <p className="top-items-title">Top Items</p>
           <ResponsiveContainer width="100%" height={200}>
-            <BarChart layout="vertical" data={topItemsData}>
+            <BarChart layout="vertical" data={topItems}>
               <XAxis type="number" />
               <YAxis
                 dataKey="name"
                 type="category"
-                width={100}
                 tick={{ fill: "#FFFFFF" }}
               />
               <Tooltip />
-              {/* Removed horizontal grid lines */}
               <Bar dataKey="count" fill="#4ab3ff" />
             </BarChart>
           </ResponsiveContainer>
