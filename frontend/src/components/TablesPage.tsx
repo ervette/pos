@@ -30,7 +30,7 @@ const TablesPage = () => {
 
   return (
     <div className="tables-page">
-      {/* Header Section */}
+      {/* Header Fixed to Top */}
       <div className="tables-header">
         <LogoHeader />
         <h1 className="tables-title">Tables</h1>
