@@ -1,0 +1,78 @@
+/* Page Container */
+.tables-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+  background-color: #1e1e1e;
+  color: white;
+}
+
+/* Header */
+.tables-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  padding: 0 15px;
+  margin-bottom: 10px; /* Reduce margin to move everything up */
+  margin-top: -100px;
+  position: relative;
+}
+
+/* Centering Title */
+.tables-title {
+  font-size: 22px;
+  font-weight: 400;
+  text-align: center;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Tables Grid */
+.tables-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  max-width: 80%;
+  margin-top: -10px; /* Moves the grid higher */
+}
+
+/* Table Card */
+.table-card {
+  width: 150px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+/* Empty Table */
+.table-card.empty {
+  border: 2px solid #404040;
+  background-color: transparent;
+  color: white;
+}
+
+/* Occupied Table */
+.table-card.occupied {
+  background-color: #404040;
+  color: white;
+}
+
+/* Hover Effect */
+.table-card:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+}
