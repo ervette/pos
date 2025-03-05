@@ -1,8 +1,8 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
-import Login from "./components/Login"
-import PrivateRoute from "./components/PrivateRoute"
-import Dashboard from "./components/Dashboard"
-// import Hello from "./components/hello"
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Login from "./components/Login";
+import PrivateRoute from "./components/PrivateRoute";
+import Dashboard from "./components/Dashboard";
+import Navbar from "./components/Navbar"; // Import Navbar
 
 function App() {
   return (
@@ -10,16 +10,22 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route
-          path="/"
+          path="/*"
           element={
             <PrivateRoute>
-              <Dashboard />
+              <>
+                <Navbar /> {/* Navbar is now part of the layout */}
+                <Routes>
+                  <Route path="/" element={<Dashboard />} />
+                  {/* Add other protected routes here */}
+                </Routes>
+              </>
             </PrivateRoute>
           }
         />
       </Routes>
     </Router>
-  )
+  );
 }
 
-export default App
+export default App;
