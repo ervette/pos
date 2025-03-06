@@ -53,10 +53,14 @@ export const createOrder = async (req: Request, res: Response) => {
 // Get all orders
 export const getOrders = async (req: Request, res: Response) => {
   try {
-    const { status } = req.query
+    const { tableNumber, status } = req.query
 
-    // ✅ Only filter if status is provided
     const filter: Record<string, unknown> = {}
+
+    if (tableNumber) {
+      filter.tableNumber = Number(tableNumber)
+    }
+
     if (status) {
       filter.orderStatus = status
     }

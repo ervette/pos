@@ -10,7 +10,7 @@ import { Order } from "../localdb"
 import LogoHeader from "../components/LogoHeader"
 import "../styles/TableOrderPage.css"
 
-// ✅ Define Types
+// ✅ Define Correct Types
 interface MenuItem {
   itemId: string
   name: string
@@ -25,6 +25,14 @@ interface MenuCategory {
   subCategories: string[]
 }
 
+interface OrderItem {
+  itemId: string
+  name: string
+  variation: string
+  price: number
+  quantity: number
+}
+
 const TableOrderPage = () => {
   const { tableNumber } = useParams<{ tableNumber: string }>()
   const tableNum: number = Number(tableNumber)
@@ -37,27 +45,46 @@ const TableOrderPage = () => {
 
   useEffect(() => {
     const fetchOrder = async () => {
-      const existingOrder = await getOrderByTable(tableNum)
+      try {
+        const existingOrder = await getOrderByTable(tableNum)
+        if (!existingOrder) {
+          console.warn(`No existing order found for table ${tableNum}`)
+          setOrder(null)
+          return
+        }
 
-      if (existingOrder) {
+        console.log(`Fetched order for table ${tableNum}:`, existingOrder)
+
+        // ✅ Ensure each item includes itemId and variation
         const fixedOrder: Order = {
           ...existingOrder,
           items: existingOrder.items.map((item) => ({
-            itemId: "itemId" in item ? item.itemId : crypto.randomUUID(), // ✅ Ensure itemId exists
+            itemId: item.itemId ?? crypto.randomUUID(), // ✅ Fix: Ensure itemId exists
             name: item.name ?? "Unknown Item",
-            variation: "variation" in item ? item.variation : "Default", // ✅ Ensure variation exists
+            variation: item.variation ?? "Default", // ✅ Fix: Ensure variation exists
             price: item.price ?? 0,
             quantity: item.quantity ?? 1,
           })),
+          totalPrice: existingOrder.totalPrice ?? 0,
         }
 
         setOrder(fixedOrder)
+      } catch (error) {
+        console.error("Error fetching order by table:", error)
       }
     }
 
     const fetchCategories = async () => {
-      const categories: MenuCategory[] = await getMenuCategories()
-      setMenuCategories(categories)
+      try {
+        const categories = await getMenuCategories()
+        if (!categories) {
+          console.warn("No menu categories found.")
+          return
+        }
+        setMenuCategories(categories)
+      } catch (error) {
+        console.error("Error fetching menu categories:", error)
+      }
     }
 
     fetchOrder()
@@ -73,20 +100,35 @@ const TableOrderPage = () => {
     }
   }, [tableNum])
 
-  const handleCategoryClick = async (category: string) => {
-    if (selectedCategory === category) {
+  const fetchItems = async (subCategory: string) => {
+    try {
+      const items = await getMenuItemsByCategory(subCategory)
+      if (!items) {
+        console.warn(`No menu items found for ${subCategory}`)
+        return
+      }
+      setMenuItems(items)
+    } catch (error) {
+      console.error("Error fetching menu items:", error)
+    }
+  }
+
+  const handleCategoryClick = (superCategory: string) => {
+    if (selectedCategory === superCategory) {
       setSelectedCategory(null)
       setMenuItems([])
       return
     }
-    setSelectedCategory(category)
-    const items: MenuItem[] = await getMenuItemsByCategory(category)
-    setMenuItems(items)
+
+    setSelectedCategory(superCategory)
+    setMenuItems([])
   }
 
   const handleAddItem = (item: MenuItem) => {
-    const newItem = {
-      itemId: item.itemId ?? crypto.randomUUID(), // ✅ Ensure itemId exists
+    if (!order) return
+
+    const newItem: OrderItem = {
+      itemId: item.itemId ?? crypto.randomUUID(),
       name: item.name,
       variation: item.variation ?? "Default",
       price: item.price,
@@ -94,12 +136,12 @@ const TableOrderPage = () => {
     }
 
     const updatedOrder: Order = {
-      ...order!,
+      ...order,
       tableNumber: tableNum,
-      items: [...(order?.items || []), newItem], // ✅ Ensure all items follow the same structure
-      totalPrice: (order?.totalPrice || 0) + item.price,
-      status: "open",
-      createdAt: order?.createdAt || new Date(),
+      items: [...order.items, newItem],
+      totalPrice: order.totalPrice + item.price,
+      orderStatus: "open",
+      createdAt: order.createdAt || new Date(),
     }
 
     setOrder(updatedOrder)
@@ -120,7 +162,6 @@ const TableOrderPage = () => {
       </div>
 
       <div className="table-order-layout">
-        {/* ✅ Left Panel - Bill Preview */}
         <div className="bill-section">
           <div className="bill-header">
             <button className="print-btn">Print Bill</button>
@@ -147,7 +188,6 @@ const TableOrderPage = () => {
           </div>
         </div>
 
-        {/* ✅ Middle Panel - Item Grid */}
         <div className="items-section">
           {menuItems.length === 0 ? (
             <p className="select-category-text">
@@ -166,7 +206,6 @@ const TableOrderPage = () => {
           )}
         </div>
 
-        {/* ✅ Right Panel - Menu Categories */}
         <div className="menu-section">
           {menuCategories.map((category) => (
             <div key={category.superCategory}>
@@ -183,7 +222,7 @@ const TableOrderPage = () => {
                   <button
                     key={sub}
                     className="subcategory-button"
-                    onClick={() => handleCategoryClick(sub)}
+                    onClick={() => fetchItems(sub)}
                   >
                     {sub}
                   </button>
