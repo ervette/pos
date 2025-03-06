@@ -1,0 +1,132 @@
+/* Dashboard Container */
+.dashboard-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+    background-color: #1e1e1e;
+    color: white;
+  }
+  
+  /* Dashboard Header - Proper Alignment */
+  .dashboard-header {
+    display: flex;
+    align-items: center; /* Ensures proper vertical alignment */
+    justify-content: space-between; /* Keep Logo left, Title centered */
+    position: relative; /* Allows absolute positioning inside */
+    height: 55px; /* Match logo height */
+    margin-bottom: 0; /* Remove unnecessary bottom spacing */
+  }
+  
+  /* Dashboard Title - Move it Higher */
+  .dashboard-title {
+    font-size: 22px;
+    font-weight: 400;
+    position: absolute; /* Fine-tune exact placement */
+    left: 50%;
+    top: 0px; /* Adjust this value if necessary */
+    transform: translateX(-50%);
+    margin: 0;
+    padding: 0;
+    line-height: 1; /* Ensure no extra height */
+    display: flex;
+    align-items: center; /* Keep text vertically centered */
+  }
+  
+  /* Sales Cards */
+  .sales-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .sales-card {
+    background-color: #2b2b2b;
+    padding: 15px;
+    border-radius: 8px;
+    width: 30%;
+    text-align: center;
+    position: relative; /* Required for pseudo-elements */
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Add Vertical Lines */
+  .sales-card::before,
+  .sales-card::after {
+    content: "";
+    position: absolute;
+    top: 10%;
+    bottom: 10%;
+    width: 2px; /* Thickness of the line */
+    background-color: rgba(255, 255, 255, 0.5); /* Color of the line */
+  }
+  
+  .sales-card::before {
+    left: 10px; /* Left vertical line */
+  }
+  
+  .sales-card::after {
+    right: 10px; /* Right vertical line */
+  }
+  
+  .sales-label {
+    font-size: 14px;
+    color: #b0b0b0;
+  }
+  
+  .sales-amount {
+    font-size: 22px;
+    font-weight: 600;
+  }
+  
+  .sales-change {
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 5px;
+  }
+  
+  .sales-change.positive {
+    color: #00ff00;
+  }
+  
+  .sales-change.negative {
+    color: #ff4444;
+  }
+  
+  /* Workload Chart & Top Items */
+  .dashboard-content {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 10px; /* Reduced spacing */
+  }
+  
+  .chart-container,
+  .top-items-container {
+    background-color: #2b2b2b;
+    border-radius: 8px;
+    padding: 15px;
+    flex: 1;
+  }
+  
+  /* Centered Titles */
+  .chart-title,
+  .top-items-title {
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  
+  /* Ensure Top Items Labels are White */
+  .yAxis .recharts-cartesian-axis-tick text {
+    fill: #ffffff !important;
+  }
+  
+  /* Hover Effect for Cards */
+  .sales-card:hover {
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    transition: box-shadow 0.2s ease-in-out;
+  }
+  

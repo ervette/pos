@@ -25,12 +25,10 @@ export const createOrder = async (req: Request, res: Response) => {
       existingOrder.updatedAt = new Date()
       await existingOrder.save()
 
-      return res
-        .status(200)
-        .json({
-          message: "Order updated instead of creating a duplicate.",
-          order: existingOrder,
-        })
+      return res.status(200).json({
+        message: "Order updated instead of creating a duplicate.",
+        order: existingOrder,
+      })
     }
 
     // ✅ Otherwise, create a new order
@@ -53,20 +51,21 @@ export const createOrder = async (req: Request, res: Response) => {
 }
 
 // Get all orders
-export const getAllOrders = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
+export const getOrders = async (req: Request, res: Response) => {
   try {
-    const orders = await Order.find()
-    return res.json(orders)
-  } catch (error: unknown) {
-    console.error("Error retrieving orders:", error)
+    const { status } = req.query
 
-    if (error instanceof Error) {
-      return res.status(500).json({ error: error.message })
+    // ✅ Only filter if status is provided
+    const filter: Record<string, unknown> = {}
+    if (status) {
+      filter.orderStatus = status
     }
-    return res.status(500).json({ error: "An unknown error occurred" })
+
+    const orders = await Order.find(filter)
+    res.json(orders)
+  } catch (error) {
+    console.error("Error fetching orders:", error)
+    res.status(500).json({ error: "Failed to fetch orders" })
   }
 }
 

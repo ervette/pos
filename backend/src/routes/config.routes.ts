@@ -1,19 +1,26 @@
-import express from "express";
+import express from "express"
+// import { authenticate } from "../middleware/auth.middleware"
 import {
-  upsertConfig,
+  createConfig,
   getConfig,
   updateParameter,
-} from "../controllers/config.controller";
+} from "../controllers/config.controller"
 
-const router = express.Router();
+const router = express.Router()
 
-// Upsert configuration
-router.post("/", upsertConfig);
+// router.post("/", createConfig)
+router.post("/", async (req, res) => {
+  try {
+    await createConfig(req, res);
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error});
+  }
+});
 
 // Get configuration
-router.get("/", getConfig);
+router.get("/", getConfig)
 
 // Update a specific parameter
-router.patch("/parameter", updateParameter);
+router.patch("/parameter", updateParameter)
 
-export default router;
+export default router

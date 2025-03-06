@@ -14,7 +14,7 @@ import menuRoutes from "./routes/menu.routes";
 import orderRoutes from "./routes/order.routes";
 import configRoutes from "./routes/config.routes";
 import syncRoutes from "./routes/sync.routes";
-
+import authRoutes from "./routes/auth.routes";
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
@@ -45,6 +45,7 @@ app.use("/api/menu", menuRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/config", configRoutes);
 app.use("/api/sync", syncRoutes);
+app.use("/api/auth", authRoutes);
 
 const PORT = process.env.PORT || 5050;
 app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));

@@ -1,0 +1,30 @@
+.logo-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 35px;
+  height: 55px;
+}
+
+.logo-image {
+  height: 55px;
+  width: 55px;
+}
+
+.vertical-separator {
+  width: 1px;
+  height: 60px;
+  background-color: #ffffff;
+}
+
+.app-name {
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 300;
+  margin: 0;
+  line-height: 55px; /* Ensure same height as the logo */
+  display: flex;
+  align-items: center; /* Ensure text is centered */
+}
