@@ -31,13 +31,15 @@ export const fetchAndCacheMenu = async (): Promise<void> => {
 
   try {
     const response = await fetch("http://localhost:5050/api/menu")
+
     if (!response.ok) {
-      throw new Error(`API request failed: ${response.statusText}`)
+      throw new Error(`Failed to fetch menu data: ${response.statusText}`)
     }
 
     const menuData = await response.json()
+    console.log("Received menu data:", menuData) // ✅ Debug the response
 
-    // ✅ Validate the API response
+    // ✅ Validate structure
     if (
       !menuData ||
       !Array.isArray(menuData.categories) ||
@@ -46,14 +48,15 @@ export const fetchAndCacheMenu = async (): Promise<void> => {
       throw new Error("Invalid menu data received from API.")
     }
 
-    console.log("Fetched menu data:", menuData)
-
+    // ✅ Save data to IndexedDB
     await db.transaction("rw", db.menuCategories, db.menuItems, async () => {
       await db.menuCategories.clear()
       await db.menuItems.clear()
       await db.menuCategories.bulkAdd(menuData.categories)
       await db.menuItems.bulkAdd(menuData.items)
     })
+
+    console.log("Menu data successfully cached.")
   } catch (error) {
     console.error("Failed to fetch menu data:", error)
   }
