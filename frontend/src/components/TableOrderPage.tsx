@@ -6,7 +6,7 @@ import {
   getMenuCategories,
   getMenuItemsByCategory,
 } from "../services/menu.service"
-import { Order } from "../localdb"
+import { Order, OrderItem } from "../localdb"
 import LogoHeader from "../components/LogoHeader"
 import "../styles/TableOrderPage.css"
 
@@ -25,16 +25,6 @@ interface MenuItem {
 interface MenuCategory {
   superCategory: string
   subCategories: string[]
-}
-
-interface OrderItem {
-  itemId: string
-  name: string
-  variation: string
-  price: number
-  quantity: number
-  modifiers?: string[]
-  notes?: string
 }
 
 const TableOrderPage = () => {
@@ -105,22 +95,26 @@ const TableOrderPage = () => {
 
   const handleAddItem = async () => {
     if (!selectedItem || !selectedVariation) {
-      console.warn("Variation must be selected before adding an item.");
-      return;
+      console.warn("Variation must be selected before adding an item.")
+      return
     }
-  
-    const variation = selectedItem.variations.find((v) => v.type === selectedVariation);
+
+    const variation = selectedItem.variations.find(
+      (v) => v.type === selectedVariation
+    )
     if (!variation) {
-      console.warn("Invalid variation selection.");
-      return;
+      console.warn("Invalid variation selection.")
+      return
     }
-  
-    let updatedOrder = order;
-  
+
+    let updatedOrder = order
+
     // ✅ Ensure orderId is always a string
     if (!updatedOrder) {
-      console.log(`No existing order found for table ${tableNum}. Creating new order...`);
-  
+      console.log(
+        `No existing order found for table ${tableNum}. Creating new order...`
+      )
+
       const newOrder: Order = {
         orderId: crypto.randomUUID(), // ✅ Guarantees a string orderId
         tableNumber: tableNum,
@@ -129,21 +123,22 @@ const TableOrderPage = () => {
         orderStatus: "open",
         createdAt: new Date(),
         updatedAt: new Date(),
-      };
-  
-      setOrder(newOrder);
-      await handleOrderSubmission(newOrder);
-      updatedOrder = newOrder;
+      }
+
+      setOrder(newOrder)
+      await handleOrderSubmission(newOrder)
+      updatedOrder = newOrder
     }
-  
+
     // ✅ Ensure updatedOrder is not null
     if (!updatedOrder) {
-      console.error("Order could not be created.");
-      return;
+      console.error("Order could not be created.")
+      return
     }
-  
+
     // ✅ Add the item to the order
     const newItem: OrderItem = {
+      orderItemId: crypto.randomUUID(),
       itemId: selectedItem.itemId,
       name: selectedItem.name,
       variation: selectedVariation,
@@ -151,32 +146,61 @@ const TableOrderPage = () => {
       quantity: 1,
       modifiers: selectedModifiers.length > 0 ? selectedModifiers : undefined,
       notes: notes.trim() ? notes : undefined,
-    };
-  
+    }
+
     updatedOrder = {
       ...updatedOrder,
       items: [...updatedOrder.items, newItem],
       totalPrice: updatedOrder.totalPrice + variation.price,
-    };
-  
-    setOrder(updatedOrder);
-    await handleOrderSubmission(updatedOrder);
-    setShowModal(false);
-  };
-  
+    }
 
-  const handleRemoveItem = async (itemId: string) => {
+    setOrder(updatedOrder)
+    await handleOrderSubmission(updatedOrder)
+    setShowModal(false)
+  }
+
+  const handleRemoveItem = async (orderItemId: string) => {
     if (!order) return
 
-    const updatedItems = order.items.filter((item) => item.itemId !== itemId)
+    console.log(
+      `🛠 Attempting to remove orderItemId: ${orderItemId} from orderId: ${order.orderId}`
+    )
+
+    // ✅ Debugging: Log all orderItemIds
+    console.log(
+      "🔍 Current order items:",
+      order.items.map((item) => item.orderItemId)
+    )
+
+    // ✅ Ensure `orderItemId` exists before making the request
+    const itemExists = order.items.some(
+      (item) => item.orderItemId === orderItemId
+    )
+    if (!itemExists) {
+      console.error(`❌ orderItemId ${orderItemId} not found in current order.`)
+      return
+    }
+
+    console.log("✅ orderItemId found. Proceeding to delete...")
+
+    const updatedItems = order.items.filter(
+      (item) => item.orderItemId !== orderItemId
+    )
     const newTotal = updatedItems.reduce(
       (sum, item) => sum + item.price * item.quantity,
       0
     )
 
+    if (!order.orderId) {
+      console.error("❌ Order ID is missing. Cannot remove item.")
+      return
+    }
+
+    console.log(`🛠 Sending DELETE request for orderItemId: ${orderItemId}`)
+    await removeOrderItem(order.orderId, orderItemId)
+
     const updatedOrder = { ...order, items: updatedItems, totalPrice: newTotal }
     setOrder(updatedOrder)
-    await removeOrderItem(order.orderId, itemId)
   }
 
   return (
@@ -209,7 +233,7 @@ const TableOrderPage = () => {
                 <span>£{item.price.toFixed(2)}</span>
                 <button
                   className="remove-btn"
-                  onClick={() => handleRemoveItem(item.itemId)}
+                  onClick={() => handleRemoveItem(item.orderItemId)}
                 >
                   ❌
                 </button>

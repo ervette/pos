@@ -92,23 +92,25 @@ export const getOrderByTable = async (
 
 export const removeOrderItem = async (
   orderId: string,
-  orderItemId: string
+  orderItemId: string // ✅ Ensure we pass `orderItemId`, not `itemId`
 ): Promise<void> => {
   try {
+    console.log(`🛠 API CALL: Deleting orderItemId: ${orderItemId} from orderId: ${orderId}`);
+
     const response = await fetch(
-      `http://localhost:5050/api/orders/${orderId}/items/${orderItemId}`,
+      `http://localhost:5050/api/orders/${orderId}/items/${orderItemId}`, // ✅ Use `orderItemId`
       {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
       }
-    )
+    );
 
     if (!response.ok) {
-      throw new Error(`Failed to remove item: ${response.statusText}`)
+      throw new Error(`❌ Failed to remove item: ${response.statusText}`);
     }
 
-    console.log(`Order item ${orderItemId} removed successfully.`)
+    console.log(`✅ Successfully deleted orderItemId: ${orderItemId} from orderId: ${orderId}`);
   } catch (error) {
-    console.error("Error removing order item:", error)
+    console.error("❌ Error removing order item:", error);
   }
-}
+};

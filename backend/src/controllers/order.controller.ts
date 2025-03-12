@@ -151,23 +151,45 @@ export const removeOrderItem = async (req: Request, res: Response) => {
   try {
     const { orderId, orderItemId } = req.params
 
+    console.log(
+      `🛠 Received DELETE request: orderId=${orderId}, orderItemId=${orderItemId}`
+    )
+
     const order = await Order.findOne({ orderId })
 
     if (!order) {
+      console.warn(`❌ Order ${orderId} not found`)
       return res.status(404).json({ error: "Order not found" })
     }
 
-    // ✅ Remove item using orderItemId
+    // ✅ Ensure the item exists before filtering
+    const itemExists = order.items.some(
+      (item) => item.orderItemId === orderItemId
+    )
+
+    if (!itemExists) {
+      console.warn(`❌ Item ${orderItemId} not found in order ${orderId}`)
+      return res
+        .status(404)
+        .json({ error: `Item ${orderItemId} not found in this order` })
+    }
+
+    // ✅ Remove item using `orderItemId`
     order.items = order.items.filter((item) => item.orderItemId !== orderItemId)
+
+    // ✅ Recalculate total price
     order.totalPrice = order.items.reduce(
       (sum, item) => sum + item.price * item.quantity,
       0
     )
 
     await order.save()
+    console.log(
+      `✅ Item ${orderItemId} removed successfully from order ${orderId}`
+    )
     return res.json({ message: "Item removed successfully", order })
   } catch (error) {
-    console.error("Error removing item:", error)
+    console.error("❌ Error removing item:", error)
     return res.status(500).json({ error: "Failed to remove item" })
   }
 }

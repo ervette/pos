@@ -1,6 +1,7 @@
 import Dexie from "dexie"
 
 export interface OrderItem {
+  orderItemId: string
   itemId: string
   name: string
   variation: string
