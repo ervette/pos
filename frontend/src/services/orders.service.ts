@@ -1,5 +1,5 @@
 import db from "../localdb/index"
-import { Order } from "../localdb/index"
+import { Order, OrderItem } from "../localdb/index"
 
 // ✅ Fetch Open Orders (Online First, Offline Fallback)
 export const getOpenOrders = async (): Promise<Order[]> => {
@@ -50,36 +50,65 @@ export const getOrderByTable = async (
 
       const orderData: Order[] = await response.json()
 
-      // ✅ Ensure at least one order exists before returning
       if (!Array.isArray(orderData) || orderData.length === 0) {
         console.warn(`No active order found for table ${tableNumber}`)
         return null
       }
 
-      console.log(`Fetched open order for table ${tableNumber}:`, orderData[0])
-
-      return orderData[0] // ✅ Always return the latest open order
+      return orderData[0]
     } catch (error) {
       console.error("Error fetching order by table:", error)
     }
   }
 
-  // ✅ Fallback to IndexedDB if offline
   try {
     const localOrder = await db
       .table("orders")
       .where("tableNumber")
       .equals(tableNumber)
-      .and((order) => order.orderStatus === "open") // ✅ Only return open orders
+      .and((order) => order.orderStatus === "open")
       .first()
 
     if (!localOrder) {
       console.warn(`No active offline order found for table ${tableNumber}`)
     }
 
-    return localOrder || null
+    return localOrder
+      ? {
+          ...localOrder,
+          items: localOrder.items.map((item: OrderItem) => ({
+            ...item,
+            variation: item.variation || "Default", // ✅ Ensure variation is always set
+            modifiers: item.modifiers ?? [], // ✅ Default to empty array if undefined
+            notes: item.notes ?? "", // ✅ Default to empty string if undefined
+          })),
+        }
+      : null
   } catch (error) {
     console.error("Error fetching order from IndexedDB:", error)
     return null
+  }
+}
+
+export const removeOrderItem = async (
+  orderId: string,
+  orderItemId: string
+): Promise<void> => {
+  try {
+    const response = await fetch(
+      `http://localhost:5050/api/orders/${orderId}/items/${orderItemId}`,
+      {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error(`Failed to remove item: ${response.statusText}`)
+    }
+
+    console.log(`Order item ${orderItemId} removed successfully.`)
+  } catch (error) {
+    console.error("Error removing order item:", error)
   }
 }

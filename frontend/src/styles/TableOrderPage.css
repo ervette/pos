@@ -1,108 +1,177 @@
-
 .table-order-container {
-    width: 100%;
-    max-width: 1200px;
-    margin: auto;
-    padding: 20px;
-    background-color: #1e1e1e;
-    color: white;
-  }
-  
-  .table-order-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 55px;
-  }
-  
-  .table-order-title {
-    font-size: 22px;
-    font-weight: 400;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  
-  .table-order-layout {
-    display: flex;
-    gap: 15px;
-    margin-top: 20px;
-  }
-  
-  /* Left Panel - Bill */
-  .bill-section {
-    flex: 1;
-    background-color: #2b2b2b;
-    padding: 15px;
-    border-radius: 8px;
-  }
-  
-  .bill-header {
-    display: flex;
-    justify-content: space-between;
-  }
-  
-  .print-btn, .pay-btn {
-    background-color: #4caf50;
-    padding: 8px;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .bill-table {
-    margin-top: 10px;
-  }
-  
-  .bill-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 5px 0;
-  }
-  
-  .bill-footer {
-    display: flex;
-    justify-content: space-between;
-    font-weight: bold;
-    margin-top: 10px;
-  }
-  
-  /* Middle Panel - Items */
-  .items-section {
-    flex: 2;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-  }
-  
-  .item-button {
-    background-color: #4ab3ff;
-    padding: 10px;
-    border: none;
-    cursor: pointer;
-    width: 100px;
-  }
-  
-  /* Right Panel - Menu */
-  .menu-section {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-  }
-  
-  .category-button {
-    background-color: #0074cc;
-    padding: 10px;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .subcategory-button {
-    background-color: #4ab3ff;
-    padding: 8px;
-    border: none;
-    cursor: pointer;
-    margin-left: 10px;
-  }
-  
+  width: 100%;
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+  background-color: #1e1e1e;
+  color: white;
+}
+
+.table-order-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 55px;
+}
+
+.table-order-title {
+  font-size: 22px;
+  font-weight: 400;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.table-order-layout {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+/* Left Panel - Bill */
+.bill-section {
+  flex: 1;
+  background-color: #2b2b2b;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.bill-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.print-btn,
+.pay-btn {
+  background-color: #4caf50;
+  padding: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.bill-table {
+  margin-top: 10px;
+}
+
+.bill-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+}
+
+.bill-footer {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* Middle Panel - Items */
+.items-section {
+  flex: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.item-button {
+  background-color: #4ab3ff;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+  width: 100px;
+}
+
+/* Right Panel - Menu */
+.menu-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.category-button {
+  background-color: #0074cc;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.subcategory-button {
+  background-color: #4ab3ff;
+  padding: 8px;
+  border: none;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+/* ✅ Full-screen modal overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6); /* ✅ Dark semi-transparent background */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* ✅ Ensure it appears on top */
+}
+
+/* ✅ Pop-up modal box */
+.modal-content {
+  background: #1a1a1a; /* ✅ Dark theme like in the design */
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+/* ✅ Close button */
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* ✅ Ensure radio buttons and checkboxes are styled */
+.modal-content label {
+  display: block;
+  margin-bottom: 8px;
+  color: white;
+  font-size: 16px;
+}
+
+/* ✅ Styling for input field */
+.modal-content input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background: #2a2a2a;
+  border: 1px solid #555;
+  color: white;
+}
+
+/* ✅ Add button */
+.add-btn {
+  width: 100%;
+  padding: 10px;
+  background: green;
+  color: white;
+  font-size: 18px;
+  border: none;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.add-btn:hover {
+  background: darkgreen;
+}

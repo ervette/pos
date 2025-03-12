@@ -1,23 +1,25 @@
 import Dexie from "dexie"
 
 export interface OrderItem {
-  itemId: string;
-  name: string;
-  variation: string; // ✅ Ensure variation is included
-  price: number;
-  quantity: number;
+  itemId: string
+  name: string
+  variation: string
+  price: number
+  quantity: number
+  modifiers?: string[] // ✅ Added this field
+  notes?: string // ✅ Added this field
 }
 
 // ✅ Define Order Schema with Correct Structure
 export interface Order {
-  _id?: string;
-  orderId: string;
-  tableNumber: number;
-  items: OrderItem[]; // ✅ Ensure Order.items uses OrderItem[]
-  totalPrice: number;
-  orderStatus: "open" | "complete" | "cancelled";
-  createdAt: Date;
-  updatedAt: Date;
+  _id?: string
+  orderId: string
+  tableNumber: number
+  items: OrderItem[] // ✅ Ensure Order.items uses OrderItem[]
+  totalPrice: number
+  orderStatus: "open" | "complete" | "cancelled"
+  createdAt: Date
+  updatedAt: Date
 }
 
 export interface SyncQueueItem {

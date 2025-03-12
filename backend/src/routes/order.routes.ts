@@ -4,7 +4,8 @@ import {
   getOrders,
   getOrderById,
   updateOrder,
-  deleteOrder
+  deleteOrder,
+  removeOrderItem
 } from "../controllers/order.controller"
 
 const router = express.Router()
@@ -21,10 +22,14 @@ const asyncHandler =
   }
 
 // CRUD endpoints for orders
+router.delete("/orders/:orderId/items/:itemId", asyncHandler(removeOrderItem));
+
 router.post("/", asyncHandler(createOrder)) // Create
 router.get("/", asyncHandler(getOrders)) // Read (all)
 router.get("/:id", asyncHandler(getOrderById)) // Read (specific order)
 router.put("/:id", asyncHandler(updateOrder)) // Update
 router.delete("/:id", asyncHandler(deleteOrder)) // Delete
+
+
 
 export default router
