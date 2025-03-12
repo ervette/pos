@@ -105,23 +105,44 @@ const TableOrderPage = () => {
 
   const handleAddItem = async () => {
     if (!selectedItem || !selectedVariation) {
-      console.warn("Variation must be selected before adding an item.")
-      return
+      console.warn("Variation must be selected before adding an item.");
+      return;
     }
-
-    const variation = selectedItem.variations.find(
-      (v) => v.type === selectedVariation
-    )
+  
+    const variation = selectedItem.variations.find((v) => v.type === selectedVariation);
     if (!variation) {
-      console.warn("Invalid variation selection.")
-      return
+      console.warn("Invalid variation selection.");
+      return;
     }
-
-    if (!order) {
-      console.error("No order found. Cannot add item.")
-      return
+  
+    let updatedOrder = order;
+  
+    // ✅ Ensure orderId is always a string
+    if (!updatedOrder) {
+      console.log(`No existing order found for table ${tableNum}. Creating new order...`);
+  
+      const newOrder: Order = {
+        orderId: crypto.randomUUID(), // ✅ Guarantees a string orderId
+        tableNumber: tableNum,
+        items: [],
+        totalPrice: 0,
+        orderStatus: "open",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+  
+      setOrder(newOrder);
+      await handleOrderSubmission(newOrder);
+      updatedOrder = newOrder;
     }
-
+  
+    // ✅ Ensure updatedOrder is not null
+    if (!updatedOrder) {
+      console.error("Order could not be created.");
+      return;
+    }
+  
+    // ✅ Add the item to the order
     const newItem: OrderItem = {
       itemId: selectedItem.itemId,
       name: selectedItem.name,
@@ -130,18 +151,19 @@ const TableOrderPage = () => {
       quantity: 1,
       modifiers: selectedModifiers.length > 0 ? selectedModifiers : undefined,
       notes: notes.trim() ? notes : undefined,
-    }
-
-    const updatedOrder = {
-      ...order,
-      items: [...order.items, newItem],
-      totalPrice: order.totalPrice + variation.price,
-    }
-
-    setOrder(updatedOrder)
-    handleOrderSubmission(updatedOrder)
-    setShowModal(false)
-  }
+    };
+  
+    updatedOrder = {
+      ...updatedOrder,
+      items: [...updatedOrder.items, newItem],
+      totalPrice: updatedOrder.totalPrice + variation.price,
+    };
+  
+    setOrder(updatedOrder);
+    await handleOrderSubmission(updatedOrder);
+    setShowModal(false);
+  };
+  
 
   const handleRemoveItem = async (itemId: string) => {
     if (!order) return
