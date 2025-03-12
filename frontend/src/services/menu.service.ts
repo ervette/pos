@@ -13,8 +13,9 @@ export interface MenuItem {
   price: number
   category: string
   subcategory: string
-  variations: { type: string; price: number; quantity: number }[] // ✅ Ensure variations exist
-  isAvailable: boolean // ✅ Include isAvailable field
+  variations: MenuVariation[]
+  isAvailable: boolean
+  modifiers?: string[]
 }
 
 export interface MenuCategory {
@@ -22,47 +23,6 @@ export interface MenuCategory {
   subCategories: string[]
 }
 
-// ✅ Fetch and Cache Menu Data (Online and Offline)
-export const fetchAndCacheMenu = async (): Promise<void> => {
-  if (!navigator.onLine) {
-    console.log("Offline: Using cached menu data.")
-    return
-  }
-
-  try {
-    const response = await fetch("http://localhost:5050/api/menu")
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch menu data: ${response.statusText}`)
-    }
-
-    const menuData = await response.json()
-    console.log("Received menu data:", menuData) // ✅ Debug the response
-
-    // ✅ Validate structure
-    if (
-      !menuData ||
-      !Array.isArray(menuData.categories) ||
-      !Array.isArray(menuData.items)
-    ) {
-      throw new Error("Invalid menu data received from API.")
-    }
-
-    // ✅ Save data to IndexedDB
-    await db.transaction("rw", db.menuCategories, db.menuItems, async () => {
-      await db.menuCategories.clear()
-      await db.menuItems.clear()
-      await db.menuCategories.bulkAdd(menuData.categories)
-      await db.menuItems.bulkAdd(menuData.items)
-    })
-
-    console.log("Menu data successfully cached.")
-  } catch (error) {
-    console.error("Failed to fetch menu data:", error)
-  }
-}
-
-// ✅ Get Menu Categories (Online/Offline)
 export const getMenuCategories = async (): Promise<MenuCategory[]> => {
   if (navigator.onLine) {
     try {
@@ -79,6 +39,88 @@ export const getMenuCategories = async (): Promise<MenuCategory[]> => {
   return db.menuCategories.toArray() // ✅ IndexedDB fallback
 }
 
+// ✅ Fetch and Cache Menu Data (Online and Offline)
+export const fetchAndCacheMenu = async (): Promise<void> => {
+  if (!navigator.onLine) {
+    console.log("Offline: Using cached menu data.")
+    return
+  }
+
+  try {
+    const response = await fetch("http://localhost:5050/api/menu")
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch menu data: ${response.statusText}`)
+    }
+
+    const menuData: {
+      _id: string
+      superCategory: string
+      subCategory: string
+      items: {
+        _id: string
+        name: string
+        variations: { type: string; price: number; quantity?: number }[]
+        isAvailable?: boolean
+        modifiers?: string[]
+      }[]
+      createdAt: string
+    }[] = await response.json()
+
+    console.log("Received menu data:", menuData) // ✅ Debug the response
+
+    // ✅ Check for correct structure
+    if (!Array.isArray(menuData)) {
+      throw new Error("Invalid menu structure received: Expected an array.")
+    }
+
+    // ✅ Transform API response into expected format
+    const categories: MenuCategory[] = menuData.map((category) => ({
+      superCategory: category.superCategory,
+      subCategories: [category.subCategory], // Ensure subCategories is an array
+    }))
+
+    const items: MenuItem[] = menuData.flatMap((category) =>
+      category.items.map(
+        (item: {
+          _id: string
+          name: string
+          variations: { type: string; price: number; quantity?: number }[]
+          isAvailable?: boolean
+          modifiers?: string[]
+        }) => ({
+          itemId: item._id,
+          name: item.name,
+          category: category.superCategory,
+          subcategory: category.subCategory,
+          variations: item.variations.map(
+            (v: { type: string; price: number; quantity?: number }) => ({
+              type: v.type,
+              price: v.price,
+              quantity: v.quantity ?? 1, // ✅ Ensure quantity exists
+            })
+          ),
+          price: item.variations.length > 0 ? item.variations[0].price : 0,
+          isAvailable: item.isAvailable ?? true,
+          modifiers: item.modifiers || [],
+        })
+      )
+    )
+
+    // ✅ Save data to IndexedDB
+    await db.transaction("rw", db.menuCategories, db.menuItems, async () => {
+      await db.menuCategories.clear()
+      await db.menuItems.clear()
+      await db.menuCategories.bulkAdd(categories)
+      await db.menuItems.bulkAdd(items)
+    })
+
+    console.log("Menu data successfully cached.")
+  } catch (error) {
+    console.error("Failed to fetch menu data:", error)
+  }
+}
+
 // ✅ Get Menu Items by Subcategory (Online/Offline)
 export const getMenuItemsByCategory = async (
   subCategory: string
@@ -88,6 +130,7 @@ export const getMenuItemsByCategory = async (
       const response = await fetch(
         `http://localhost:5050/api/menu/items?subCategory=${subCategory}`
       )
+
       if (response.ok) {
         const categoryData: {
           items: {
@@ -106,12 +149,14 @@ export const getMenuItemsByCategory = async (
           name: item.name,
           category: item.category,
           subcategory: item.subcategory,
-          variations: item.variations.map((v) => ({
-            type: v.type,
-            price: v.price,
-            quantity: v.quantity ?? 1, // ✅ Ensure quantity exists
-          })) as MenuVariation[], // ✅ Explicitly cast to MenuVariation[]
-          price: item.variations.length > 0 ? item.variations[0].price : 0, // ✅ Assign price from first variation
+          variations: item.variations.map(
+            (v: { type: string; price: number; quantity?: number }) => ({
+              type: v.type,
+              price: v.price,
+              quantity: v.quantity ?? 1,
+            })
+          ) as MenuVariation[],
+          price: item.variations.length > 0 ? item.variations[0].price : 0,
           isAvailable: item.isAvailable ?? true,
           modifiers: item.modifiers || [],
         }))
@@ -121,7 +166,6 @@ export const getMenuItemsByCategory = async (
     }
   }
 
-  // ✅ IndexedDB fallback with quantity fix
   return db.menuItems
     .where("subcategory")
     .equals(subCategory)
@@ -129,20 +173,11 @@ export const getMenuItemsByCategory = async (
     .then((items) =>
       items.map((item) => ({
         ...item,
-        variations: item.variations.map((v) => ({
+        variations: item.variations.map((v: MenuVariation) => ({
           ...v,
-          quantity: v.quantity ?? 1, // ✅ Ensure quantity exists in offline mode
-        })) as MenuVariation[], // ✅ Explicitly cast to MenuVariation[]
-        price: item.variations.length > 0 ? item.variations[0].price : 0, // ✅ Assign price from first variation
+          quantity: v.quantity ?? 1,
+        })),
+        price: item.variations.length > 0 ? item.variations[0].price : 0,
       }))
     )
 }
-
-// ✅ Sync Menu Data When Online
-export const syncMenuData = async (): Promise<void> => {
-  console.log("Reconnecting: Syncing menu data...")
-  await fetchAndCacheMenu()
-}
-
-// ✅ Automatically Sync Menu Data When Going Online
-window.addEventListener("online", syncMenuData)
