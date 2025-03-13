@@ -150,46 +150,55 @@ export const deleteOrder = async (
 export const removeOrderItem = async (req: Request, res: Response) => {
   try {
     const { orderId, orderItemId } = req.params
-
     console.log(
-      `🛠 Received DELETE request: orderId=${orderId}, orderItemId=${orderItemId}`
+      `🛠 Removing orderItemId: ${orderItemId} from orderId: ${orderId}`
     )
 
-    const order = await Order.findOne({ orderId })
+    // ✅ Ensure we query by `orderId` (UUID string), NOT `_id`
+    const order = await Order.findOne({ orderId: orderId })
 
     if (!order) {
-      console.warn(`❌ Order ${orderId} not found`)
+      console.error(`❌ Order not found: ${orderId}`)
       return res.status(404).json({ error: "Order not found" })
     }
 
-    // ✅ Ensure the item exists before filtering
-    const itemExists = order.items.some(
-      (item) => item.orderItemId === orderItemId
+    console.log(
+      `🔍 Current order items before removal:`,
+      order.items.map((i) => i.orderItemId)
     )
 
-    if (!itemExists) {
-      console.warn(`❌ Item ${orderItemId} not found in order ${orderId}`)
-      return res
-        .status(404)
-        .json({ error: `Item ${orderItemId} not found in this order` })
+    // ✅ Find item by `orderItemId`
+    const itemIndex = order.items.findIndex(
+      (item) => item.orderItemId === orderItemId
+    )
+    if (itemIndex === -1) {
+      console.error(
+        `❌ orderItemId ${orderItemId} not found in order ${orderId}`
+      )
+      return res.status(404).json({ error: "Item not found in order" })
     }
 
-    // ✅ Remove item using `orderItemId`
-    order.items = order.items.filter((item) => item.orderItemId !== orderItemId)
-
-    // ✅ Recalculate total price
+    // ✅ Remove item
+    order.items.splice(itemIndex, 1)
     order.totalPrice = order.items.reduce(
       (sum, item) => sum + item.price * item.quantity,
       0
     )
 
-    await order.save()
     console.log(
-      `✅ Item ${orderItemId} removed successfully from order ${orderId}`
+      `✅ Updated order items after removal:`,
+      order.items.map((i) => i.orderItemId)
     )
+
+    // ✅ Save updated order
+    await order.save()
+    console.log(`✅ Order updated successfully.`)
+
     return res.json({ message: "Item removed successfully", order })
   } catch (error) {
     console.error("❌ Error removing item:", error)
-    return res.status(500).json({ error: "Failed to remove item" })
+    return res
+      .status(500)
+      .json({ error: "Failed to remove item", details: (error as Error).message })
   }
 }

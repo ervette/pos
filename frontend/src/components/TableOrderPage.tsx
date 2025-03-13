@@ -165,24 +165,21 @@ const TableOrderPage = () => {
     console.log(
       `🛠 Attempting to remove orderItemId: ${orderItemId} from orderId: ${order.orderId}`
     )
-
-    // ✅ Debugging: Log all orderItemIds
     console.log(
       "🔍 Current order items:",
       order.items.map((item) => item.orderItemId)
     )
 
-    // ✅ Ensure `orderItemId` exists before making the request
+    // ✅ Check if the item exists before trying to remove it
     const itemExists = order.items.some(
       (item) => item.orderItemId === orderItemId
     )
     if (!itemExists) {
-      console.error(`❌ orderItemId ${orderItemId} not found in current order.`)
+      console.warn(`❌ orderItemId ${orderItemId} not found in current order.`)
       return
     }
 
-    console.log("✅ orderItemId found. Proceeding to delete...")
-
+    // ✅ Remove item from local state
     const updatedItems = order.items.filter(
       (item) => item.orderItemId !== orderItemId
     )
@@ -191,16 +188,14 @@ const TableOrderPage = () => {
       0
     )
 
-    if (!order.orderId) {
-      console.error("❌ Order ID is missing. Cannot remove item.")
-      return
-    }
-
-    console.log(`🛠 Sending DELETE request for orderItemId: ${orderItemId}`)
-    await removeOrderItem(order.orderId, orderItemId)
-
+    // ✅ Update UI immediately
     const updatedOrder = { ...order, items: updatedItems, totalPrice: newTotal }
     setOrder(updatedOrder)
+
+    console.log(`🛠 Sending DELETE request for orderItemId: ${orderItemId}`)
+
+    // ✅ Send request to backend
+    await removeOrderItem(order.orderId, orderItemId)
   }
 
   return (
