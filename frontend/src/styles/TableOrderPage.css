@@ -1,17 +1,23 @@
 .table-order-container {
   width: 100%;
+  height: 100vh;
   max-width: 1200px;
   margin: auto;
   padding: 20px;
-  background-color: #1e1e1e;
+  background-color: #1e1e1e; /* Dark theme */
   color: white;
+  display: flex;
+  flex-direction: column;
+  font-family: Arial, sans-serif;
 }
 
+/* ✅ Logo + Header */
 .table-order-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 55px;
+  position: relative;
 }
 
 .table-order-title {
@@ -22,41 +28,71 @@
   transform: translateX(-50%);
 }
 
+/* ✅ Main Layout */
 .table-order-layout {
   display: flex;
   gap: 15px;
   margin-top: 20px;
+  height: calc(100vh - 100px); /* Make it fit viewport */
+  overflow: hidden; /* Prevent full page scrolling */
 }
 
-/* Left Panel - Bill */
+/* === Left Panel: Bill Section (Scrollable) === */
 .bill-section {
   flex: 1;
   background-color: #2b2b2b;
   padding: 15px;
   border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto; /* Enable scrolling */
 }
 
 .bill-header {
   display: flex;
   justify-content: space-between;
+  margin-bottom: 10px;
 }
 
 .print-btn,
 .pay-btn {
   background-color: #4caf50;
-  padding: 8px;
+  padding: 8px 12px;
+  border-radius: 5px;
   border: none;
   cursor: pointer;
+  color: white;
+  font-weight: bold;
+}
+
+.pay-btn {
+  background-color: #2cb82c;
 }
 
 .bill-table {
-  margin-top: 10px;
+  flex-grow: 1;
+  overflow-y: auto;
 }
 
 .bill-row {
   display: flex;
   justify-content: space-between;
-  padding: 5px 0;
+  padding: 8px 0;
+  align-items: center;
+  border-bottom: 1px solid #444;
+}
+
+.bill-row.header {
+  font-weight: bold;
+}
+
+.remove-btn {
+  background: none;
+  border: none;
+  color: red;
+  font-size: 16px;
+  cursor: pointer;
 }
 
 .bill-footer {
@@ -64,65 +100,127 @@
   justify-content: space-between;
   font-weight: bold;
   margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #444;
 }
 
-/* Middle Panel - Items */
+/* ✅ Bill Actions */
+.bill-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.cancel-btn,
+.gratuity-btn,
+.send-btn {
+  flex: 1;
+  padding: 10px;
+  margin: 5px;
+  border-radius: 5px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background-color: red;
+  color: white;
+}
+
+.gratuity-btn {
+  background-color: orange;
+  color: black;
+}
+
+.send-btn {
+  background-color: #ff9800;
+  color: white;
+}
+
+/* === Middle Panel: Items Section === */
 .items-section {
   flex: 2;
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   justify-content: center;
+  overflow-y: auto; /* Enable scrolling */
+  max-height: 100%;
 }
 
+/* ✅ Fix for Oversized Buttons */
 .item-button {
   background-color: #4ab3ff;
   padding: 10px;
+  border-radius: 5px;
   border: none;
   cursor: pointer;
-  width: 100px;
+  width: 140px; /* Fixed width */
+  height: 60px; /* Set height */
+  text-align: center;
+  color: white;
+  font-weight: bold;
 }
 
-/* Right Panel - Menu */
+.item-button:hover {
+  background-color: #0074cc;
+}
+
+/* === Right Panel: Menu Section === */
 .menu-section {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 5px;
+  overflow-y: auto; /* Enable scrolling */
+  max-height: 100%;
 }
 
 .category-button {
   background-color: #0074cc;
   padding: 10px;
+  border-radius: 5px;
   border: none;
   cursor: pointer;
+  color: white;
+  font-weight: bold;
+  display: block;
+}
+
+.subcategory-container {
+  margin-left: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
 .subcategory-button {
   background-color: #4ab3ff;
   padding: 8px;
+  border-radius: 5px;
   border: none;
   cursor: pointer;
-  margin-left: 10px;
+  color: white;
+  text-align: left;
 }
 
-/* ✅ Full-screen modal overlay */
+/* === Modal Popup === */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6); /* ✅ Dark semi-transparent background */
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000; /* ✅ Ensure it appears on top */
+  z-index: 1000;
 }
 
-/* ✅ Pop-up modal box */
 .modal-content {
-  background: #1a1a1a; /* ✅ Dark theme like in the design */
+  background: #1a1a1a;
   padding: 20px;
   border-radius: 8px;
   width: 400px;
@@ -130,7 +228,6 @@
   position: relative;
 }
 
-/* ✅ Close button */
 .close-btn {
   position: absolute;
   top: 10px;
