@@ -25,6 +25,7 @@
 .logo-container {
   display: flex;
   align-items: center;
+  margin-top: 4vh;
 }
 
 .logo-container img {
@@ -319,4 +320,84 @@
 
 .add-btn:hover {
   background: darkgreen;
+}
+
+/* ✅ Mobile Support */
+@media screen and (max-width: 768px) {
+  /* ✅ Adjust Layout for Small Screens */
+  .table-order-layout {
+    flex-direction: column;
+    height: auto;
+    gap: 10px;
+  }
+
+  /* ✅ Make Bill Section Take Full Width */
+  .bill-section {
+    width: 100%;
+    height: auto;
+  }
+
+  /* ✅ Ensure Items Section is Scrollable */
+  .items-section {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    display: flex;
+    flex-direction: row;
+    padding-bottom: 10px;
+    max-height: 180px; /* Prevents excessive height */
+  }
+
+  /* ✅ Make Buttons Bigger for Touch Screens */
+  .item-button,
+  .category-button,
+  .subcategory-button {
+    width: 120px;
+    height: 50px;
+    font-size: 14px;
+  }
+
+  /* ✅ Fix Category Layout on Mobile */
+  .menu-section {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 10px;
+  }
+
+  .category-block {
+    display: inline-block;
+    margin-right: 10px;
+  }
+
+  /* ✅ Fix Modal for Smaller Screens */
+  .modal-content {
+    width: 90%;
+    max-width: 350px;
+    padding: 15px;
+  }
+
+  /* ✅ Ensure Variation Options Stay Inline */
+  .modal-options {
+    flex-wrap: wrap;
+  }
+
+  /* ✅ Fix Close Button on Mobile */
+  .modal-content .close-btn {
+    top: 8px;
+    left: 8px;
+    font-size: 18px;
+  }
+
+  /* ✅ Fix Text Area for Notes */
+  .modal-content textarea {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  /* ✅ Fix Add Button */
+  .add-btn {
+    font-size: 16px;
+    padding: 10px;
+  }
 }
