@@ -1,19 +1,26 @@
-/* Roboto font */
+/* Import Roboto Font */
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;600;800&display=swap");
 
 /* Global Settings */
-html,
-body {
+html, body {
   margin: 0;
   padding: 0;
   height: 100%;
   font-family: "Roboto", sans-serif;
   background-color: #1e1e1e;
+  overflow: hidden; /* ✅ Prevent full-page scrolling */
+  text-rendering: optimizeLegibility;
+}
+
+/* ✅ Ensure Proper Box Sizing */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 #root {
   height: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;
 }

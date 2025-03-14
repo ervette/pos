@@ -4,11 +4,12 @@
   max-width: 1200px;
   margin: auto;
   padding: 20px;
-  background-color: #1e1e1e; /* Dark theme */
+  background-color: #1e1e1e;
   color: white;
   display: flex;
   flex-direction: column;
   font-family: Arial, sans-serif;
+  overflow: hidden; /* Prevents full-page scrolling */
 }
 
 /* ✅ Logo + Header */
@@ -28,13 +29,18 @@
   transform: translateX(-50%);
 }
 
+.table-order-header img {
+  max-height: 40px; /* Fix logo height */
+  margin-left: 10px; /* Adjust to prevent it from being too high */
+}
+
 /* ✅ Main Layout */
 .table-order-layout {
   display: flex;
   gap: 15px;
   margin-top: 20px;
-  height: calc(100vh - 100px); /* Make it fit viewport */
-  overflow: hidden; /* Prevent full page scrolling */
+  height: calc(100vh - 100px);
+  overflow: hidden;
 }
 
 /* === Left Panel: Bill Section (Scrollable) === */
@@ -46,7 +52,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  overflow-y: auto; /* Enable scrolling */
+  overflow-y: auto;
 }
 
 .bill-header {
@@ -70,14 +76,15 @@
   background-color: #2cb82c;
 }
 
+/* ✅ Proper Bill Table Layout */
 .bill-table {
   flex-grow: 1;
   overflow-y: auto;
 }
 
 .bill-row {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 3fr 1fr 1fr 30px; /* Ensures proper column layout */
   padding: 8px 0;
   align-items: center;
   border-bottom: 1px solid #444;
@@ -93,8 +100,18 @@
   color: red;
   font-size: 16px;
   cursor: pointer;
+  justify-self: end;
 }
 
+/* ✅ Ensuring Notes Are Properly Positioned */
+.bill-row .item-notes {
+  grid-column: 1 / -1;
+  font-size: 16px;
+  color: #bbb;
+  margin-top: 3px;
+}
+
+/* ✅ Bill Footer Alignment */
 .bill-footer {
   display: flex;
   justify-content: space-between;
@@ -104,7 +121,7 @@
   border-top: 1px solid #444;
 }
 
-/* ✅ Bill Actions */
+/* ✅ Bill Actions - Bigger Buttons */
 .bill-actions {
   display: flex;
   justify-content: space-between;
@@ -115,7 +132,7 @@
 .gratuity-btn,
 .send-btn {
   flex: 1;
-  padding: 10px;
+  padding: 12px;
   margin: 5px;
   border-radius: 5px;
   border: none;
@@ -138,54 +155,32 @@
   color: white;
 }
 
-/* === Middle Panel: Items Section === */
+/* === Middle Panel: Items Section (Scrollable) === */
 .items-section {
   flex: 2;
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   justify-content: center;
-  overflow-y: auto; /* Enable scrolling */
+  overflow-y: auto;
   max-height: 100%;
 }
 
-/* ✅ Fix for Oversized Buttons */
-.item-button {
-  background-color: #4ab3ff;
-  padding: 10px;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
-  width: 140px; /* Fixed width */
-  height: 60px; /* Set height */
+/* ✅ Fixing Button Sizes */
+.item-button, .category-button, .subcategory-button {
+  width: 140px;
+  height: 60px;
   text-align: center;
-  color: white;
   font-weight: bold;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-.item-button:hover {
-  background-color: #0074cc;
-}
-
-/* === Right Panel: Menu Section === */
-.menu-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  overflow-y: auto; /* Enable scrolling */
-  max-height: 100%;
-}
-
+/* ✅ Fix Category & Subcategory Layout */
 .category-button {
   background-color: #0074cc;
-  padding: 10px;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
-  color: white;
-  font-weight: bold;
-  display: block;
 }
 
 .subcategory-container {
@@ -197,15 +192,9 @@
 
 .subcategory-button {
   background-color: #4ab3ff;
-  padding: 8px;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
-  color: white;
-  text-align: left;
 }
 
-/* === Modal Popup === */
+/* === Modal Popup (Fixed Layout Issues) === */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -223,15 +212,16 @@
   background: #1a1a1a;
   padding: 20px;
   border-radius: 8px;
-  width: 400px;
+  width: 450px; /* ✅ Make it more horizontal */
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
   position: relative;
 }
 
-.close-btn {
+/* ✅ Move Close Button to Top Left */
+.modal-content .close-btn {
   position: absolute;
   top: 10px;
-  right: 15px;
+  left: 10px;
   background: none;
   border: none;
   color: white;
@@ -239,17 +229,26 @@
   cursor: pointer;
 }
 
-/* ✅ Ensure radio buttons and checkboxes are styled */
-.modal-content label {
-  display: block;
-  margin-bottom: 8px;
-  color: white;
-  font-size: 16px;
+/* ✅ Inline "Select Variation" with Options */
+.modal-content h4 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-/* ✅ Styling for input field */
-.modal-content input[type="text"] {
+.modal-content label {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 15px;
+  font-size: 16px;
+  color: white;
+}
+
+/* ✅ Fix Special Instructions Input Width */
+.modal-content textarea {
   width: 100%;
+  max-width: 100%;
+  min-width: 100%;
   padding: 10px;
   margin-top: 10px;
   background: #2a2a2a;
@@ -257,10 +256,10 @@
   color: white;
 }
 
-/* ✅ Add button */
+/* ✅ Fix Add Button */
 .add-btn {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   background: green;
   color: white;
   font-size: 18px;
