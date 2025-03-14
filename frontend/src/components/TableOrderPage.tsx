@@ -201,7 +201,9 @@ const TableOrderPage = () => {
   return (
     <div className="table-order-container">
       <div className="table-order-header">
-        <LogoHeader />
+        <div className="logo-container">
+          <LogoHeader />
+        </div>
         <h1 className="table-order-title">Table {tableNum}</h1>
       </div>
 
@@ -220,7 +222,7 @@ const TableOrderPage = () => {
               <span>Price</span>
             </div>
             {order?.items?.map((item, index) => (
-              <div key={index} className="bill-row">
+              <div key={index} className="bill-row colored-item">
                 <span>
                   {item.name} {item.variation}
                 </span>
@@ -270,23 +272,26 @@ const TableOrderPage = () => {
         {/* ✅ Right Panel (Categories) */}
         <div className="menu-section">
           {menuCategories.map((category) => (
-            <div key={category.superCategory}>
+            <div key={category.superCategory} className="category-block">
               <button
                 className="category-button"
                 onClick={() => handleCategoryClick(category.superCategory)}
               >
                 {category.superCategory}
               </button>
-              {selectedCategory === category.superCategory &&
-                category.subCategories.map((sub) => (
-                  <button
-                    key={sub}
-                    className="subcategory-button"
-                    onClick={() => fetchItems(sub)}
-                  >
-                    {sub}
-                  </button>
-                ))}
+              {selectedCategory === category.superCategory && (
+                <div className="subcategory-list">
+                  {category.subCategories.map((sub) => (
+                    <button
+                      key={sub}
+                      className="subcategory-button"
+                      onClick={() => fetchItems(sub)}
+                    >
+                      {sub}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -307,18 +312,21 @@ const TableOrderPage = () => {
 
             {/* ✅ Variations Selection */}
             <h4>Select Variation:</h4>
-            {selectedItem.variations.map((variation, idx) => (
-              <label key={idx} className="variation-label">
-                <input
-                  type="radio"
-                  name="variation"
-                  value={variation.type}
-                  checked={selectedVariation === variation.type}
-                  onChange={() => setSelectedVariation(variation.type)}
-                />
-                {variation.type} - £{variation.price.toFixed(2)}
-              </label>
-            ))}
+            <div className="modal-options">
+              <h4>Select Variation:</h4>
+              {selectedItem.variations.map((variation, idx) => (
+                <label key={idx}>
+                  <input
+                    type="radio"
+                    name="variation"
+                    value={variation.type}
+                    checked={selectedVariation === variation.type}
+                    onChange={() => setSelectedVariation(variation.type)}
+                  />
+                  {variation.type} - £{variation.price.toFixed(2)}
+                </label>
+              ))}
+            </div>
 
             {/* ✅ Modifiers Selection */}
             {selectedItem.modifiers && selectedItem.modifiers.length > 0 && (

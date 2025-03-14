@@ -1,3 +1,4 @@
+/* ✅ Global Container */
 .table-order-container {
   width: 100%;
   height: 100vh;
@@ -21,17 +22,22 @@
   position: relative;
 }
 
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo-container img {
+  max-height: 40px; /* Fixed logo height */
+  margin-left: 10px; /* Adjust to prevent it from being too high */
+}
+
 .table-order-title {
   font-size: 22px;
   font-weight: 400;
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-}
-
-.table-order-header img {
-  max-height: 40px; /* Fix logo height */
-  margin-left: 10px; /* Adjust to prevent it from being too high */
 }
 
 /* ✅ Main Layout */
@@ -43,7 +49,7 @@
   overflow: hidden;
 }
 
-/* === Left Panel: Bill Section (Scrollable) === */
+/* ✅ Left Panel: Bill Section */
 .bill-section {
   flex: 1;
   background-color: #2b2b2b;
@@ -76,7 +82,7 @@
   background-color: #2cb82c;
 }
 
-/* ✅ Proper Bill Table Layout */
+/* ✅ Fix Bill Table Layout */
 .bill-table {
   flex-grow: 1;
   overflow-y: auto;
@@ -84,7 +90,7 @@
 
 .bill-row {
   display: grid;
-  grid-template-columns: 3fr 1fr 1fr 30px; /* Ensures proper column layout */
+  grid-template-columns: 3fr 1fr 1fr 30px; /* Proper column layout */
   padding: 8px 0;
   align-items: center;
   border-bottom: 1px solid #444;
@@ -92,6 +98,7 @@
 
 .bill-row.header {
   font-weight: bold;
+  margin-bottom: 5px;
 }
 
 .remove-btn {
@@ -103,7 +110,7 @@
   justify-self: end;
 }
 
-/* ✅ Ensuring Notes Are Properly Positioned */
+/* ✅ Fix Notes Placement */
 .bill-row .item-notes {
   grid-column: 1 / -1;
   font-size: 16px;
@@ -111,7 +118,15 @@
   margin-top: 3px;
 }
 
-/* ✅ Bill Footer Alignment */
+/* ✅ Color for Selected Items */
+.colored-item {
+  background-color: #3a3a3a;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 5px;
+}
+
+/* ✅ Bill Footer */
 .bill-footer {
   display: flex;
   justify-content: space-between;
@@ -155,7 +170,7 @@
   color: white;
 }
 
-/* === Middle Panel: Items Section (Scrollable) === */
+/* ✅ Middle Panel: Items Section */
 .items-section {
   flex: 2;
   display: flex;
@@ -166,24 +181,52 @@
   max-height: 100%;
 }
 
-/* ✅ Fixing Button Sizes */
-.item-button, .category-button, .subcategory-button {
+/* ✅ Fix Item Buttons */
+.item-button {
+  background-color: #4ab3ff;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
   width: 140px;
   height: 60px;
   text-align: center;
-  font-weight: bold;
   color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+  font-weight: bold;
 }
 
-/* ✅ Fix Category & Subcategory Layout */
-.category-button {
+.item-button:hover {
   background-color: #0074cc;
 }
 
-.subcategory-container {
+/* ✅ Right Panel: Category & Subcategory */
+.menu-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  overflow-y: auto;
+  max-height: 100%;
+}
+
+.category-block {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+.category-button {
+  background-color: #0074cc;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-weight: bold;
+  text-align: left;
+}
+
+.subcategory-list {
   margin-left: 15px;
   display: flex;
   flex-direction: column;
@@ -192,9 +235,15 @@
 
 .subcategory-button {
   background-color: #4ab3ff;
+  padding: 8px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  color: white;
+  text-align: left;
 }
 
-/* === Modal Popup (Fixed Layout Issues) === */
+/* ✅ Modal Styling */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -212,12 +261,12 @@
   background: #1a1a1a;
   padding: 20px;
   border-radius: 8px;
-  width: 450px; /* ✅ Make it more horizontal */
+  width: 450px; /* ✅ More horizontal layout */
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
   position: relative;
 }
 
-/* ✅ Move Close Button to Top Left */
+/* ✅ Close Button Position */
 .modal-content .close-btn {
   position: absolute;
   top: 10px;
@@ -229,8 +278,8 @@
   cursor: pointer;
 }
 
-/* ✅ Inline "Select Variation" with Options */
-.modal-content h4 {
+/* ✅ Inline "Select Variation" */
+.modal-options {
   display: flex;
   align-items: center;
   gap: 10px;
