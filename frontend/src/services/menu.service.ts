@@ -181,3 +181,18 @@ export const getMenuItemsByCategory = async (
       }))
     )
 }
+
+export const getAllMenuItemsSafe = async (): Promise<MenuItem[]> => {
+  const categories = await getMenuCategories()
+  const allItems: MenuItem[] = []
+
+  // Fetch all subcategories one by one, then fetch items
+  for (const category of categories) {
+    for (const sub of category.subCategories) {
+      const itemsInSub = await getMenuItemsByCategory(sub)
+      allItems.push(...itemsInSub)
+    }
+  }
+
+  return allItems
+}

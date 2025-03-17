@@ -9,7 +9,7 @@ import {
 import { handleOrderSubmission } from "../services/sync.service"
 import {
   getMenuCategories,
-  getMenuItemsByCategory,
+  getMenuItemsByCategory
 } from "../services/menu.service"
 import { Order, OrderItem } from "../localdb"
 import LogoHeader from "../components/LogoHeader"
@@ -33,6 +33,24 @@ interface MenuCategory {
   superCategory: string
   subCategories: string[]
 }
+
+interface MenuAPIItem {
+  _id: string
+  name: string
+  variations: { type: string; price: number; quantity?: number }[]
+  isAvailable?: boolean
+  modifiers?: string[]
+}
+
+interface MenuAPICategory {
+  _id: string
+  superCategory: string
+  subCategory: string
+  items: MenuAPIItem[]
+  createdAt: string
+  updatedAt: string
+}
+
 
 const TableOrderPage = () => {
   const { tableNumber } = useParams<{ tableNumber: string }>()
@@ -294,62 +312,64 @@ const TableOrderPage = () => {
     }
   }
 
-  const handleSendOrder = () => {
+  const handleSendOrder = async () => {
     if (!order || order.items.length === 0) {
-      console.warn("No items in order to send.");
-      return;
+      console.warn("No items in order to send.")
+      return
     }
   
-    if (menuCategories.length === 0) {
-      console.warn("Menu categories not loaded.");
-      return;
-    }
+    // ✅ Fetch all menu data with correct typing
+    const menuData = await fetch("http://localhost:5050/api/menu")
+    const menuJson: MenuAPICategory[] = await menuData.json()
   
-    const drinksItems: OrderItem[] = [];
-    const otherItems: OrderItem[] = [];
+    // ✅ Build itemId → superCategory map
+    const itemCategoryMap: Record<string, string> = {}
+    menuJson.forEach((cat) => {
+      cat.items.forEach((item) => {
+        itemCategoryMap[item._id] = cat.superCategory
+      })
+    })
   
-    order.items.forEach((orderItem) => {
-      let foundSuperCategory: string | null = null;
+    const drinksItems: OrderItem[] = []
+    const foodItems: OrderItem[] = []
   
-      // ✅ Search through all menuCategories to find item's superCategory
-      for (const category of menuCategories) {
-        const match = menuItems.find(
-          (menuItem) => menuItem.itemId === orderItem.itemId
-        );
+    order.items.forEach((item) => {
+      const superCategory = itemCategoryMap[item.itemId]
   
-        if (match) {
-          foundSuperCategory = category.superCategory;
-          break;
-        }
+      if (!superCategory) {
+        console.warn(`⚠️ Item with ID ${item.itemId} not found in menu.`)
+        return
       }
   
-      // ✅ Categorize based on superCategory
-      if (foundSuperCategory?.toLowerCase() === "drinks") {
-        drinksItems.push(orderItem);
+      if (superCategory === "Drinks") {
+        drinksItems.push(item)
       } else {
-        otherItems.push(orderItem);
+        foodItems.push(item)
       }
-    });
+    })
   
-    // ✅ Formatter for pretty logs
-    const formatItems = (items: OrderItem[]) => {
-      return items
-        .map((item) => {
-          const base = `${item.name} ${item.variation ?? ""} | Qty: ${item.quantity} | £${item.price.toFixed(2)}`;
-          const mods = item.modifiers?.length
-            ? `  Modifiers: ${item.modifiers.join(", ")}`
-            : "";
-          const note = item.notes ? `  Note: ${item.notes}` : "";
-          return `${base}${mods ? `\n${mods}` : ""}${note ? `\n${note}` : ""}`;
-        })
-        .join("\n---\n");
-    };
+    console.log("=== 🥤 Drinks Order ===")
+    if (drinksItems.length > 0) {
+      drinksItems.forEach((item) =>
+        console.log(
+          `${item.name} (${item.variation}) x${item.quantity} - £${item.price.toFixed(2)}`
+        )
+      )
+    } else {
+      console.log("No drinks items.")
+    }
   
-    // ✅ Final logs
-    console.log("🥤 Drinks Order:\n======================\n" + (drinksItems.length ? formatItems(drinksItems) : "None"));
-    console.log("🍽️ Food Order:\n======================\n" + (otherItems.length ? formatItems(otherItems) : "None"));
-  };
-  
+    console.log("=== 🍽️ Food Order ===")
+    if (foodItems.length > 0) {
+      foodItems.forEach((item) =>
+        console.log(
+          `${item.name} (${item.variation}) x${item.quantity} - £${item.price.toFixed(2)}`
+        )
+      )
+    } else {
+      console.log("No food items.")
+    }
+  }
 
   return (
     <div className="table-order-container">
