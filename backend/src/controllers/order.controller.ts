@@ -102,12 +102,13 @@ export const updateOrder = async (
     const { items } = req.body
 
     // ✅ Ensure every item in the order has a unique `orderItemId`
-    items.forEach((item: IOrderItem) => {
-      if (!item.orderItemId) {
-        item.orderItemId = crypto.randomUUID()
-      }
-    })
-
+    if (Array.isArray(items)) {
+      items.forEach((item: IOrderItem) => {
+        if (!item.orderItemId) {
+          item.orderItemId = crypto.randomUUID()
+        }
+      })
+    }
     const updatedOrder = await Order.findByIdAndUpdate(
       req.params.id,
       { ...req.body, items },
@@ -199,6 +200,9 @@ export const removeOrderItem = async (req: Request, res: Response) => {
     console.error("❌ Error removing item:", error)
     return res
       .status(500)
-      .json({ error: "Failed to remove item", details: (error as Error).message })
+      .json({
+        error: "Failed to remove item",
+        details: (error as Error).message,
+      })
   }
 }

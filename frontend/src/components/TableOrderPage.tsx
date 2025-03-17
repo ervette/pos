@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { useParams } from "react-router-dom"
-import { getOrderByTable, removeOrderItem } from "../services/orders.service"
+import { getOrderByTable, removeOrderItem, cancelOrder } from "../services/orders.service"
 import { handleOrderSubmission } from "../services/sync.service"
 import {
   getMenuCategories,
@@ -30,7 +31,7 @@ interface MenuCategory {
 const TableOrderPage = () => {
   const { tableNumber } = useParams<{ tableNumber: string }>()
   const tableNum: number = Number(tableNumber)
-
+  const navigate = useNavigate();
   const [order, setOrder] = useState<Order | null>(null)
   const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
@@ -198,6 +199,21 @@ const TableOrderPage = () => {
     await removeOrderItem(order.orderId, orderItemId)
   }
 
+  const handleCancelOrder = async () => {
+    if (!order) return;
+  
+    try {
+      await cancelOrder(order._id as string);
+      setOrder({ ...order, orderStatus: "cancelled" });
+      alert("Order cancelled successfully.");
+      navigate("/tables")
+    } catch (error) {
+      console.error("Failed to cancel order:", error);
+      alert("Failed to cancel order. Please try again.");
+    }
+  };
+  
+
   return (
     <div className="table-order-container">
       <div className="table-order-header">
@@ -250,7 +266,7 @@ const TableOrderPage = () => {
             <span>£{order?.totalPrice.toFixed(2) || "0.00"}</span>
           </div>
           <div className="bill-actions">
-            <button className="cancel-btn">Cancel</button>
+            <button className="cancel-btn" onClick={handleCancelOrder}>Cancel</button>
             <button className="gratuity-btn">Gratuity</button>
             <button className="send-btn">Send</button>
           </div>

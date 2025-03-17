@@ -116,3 +116,20 @@ export const removeOrderItem = async (
     console.error("❌ Error removing order item:", error)
   }
 }
+
+export const cancelOrder = async (_id: string) => {
+  const response = await fetch(`http://localhost:5050/api/orders/${_id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ orderStatus: "cancelled" }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to cancel the order");
+  }
+
+  const data = await response.json();
+  return data;
+};
