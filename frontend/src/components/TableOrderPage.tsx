@@ -9,7 +9,7 @@ import {
 import { handleOrderSubmission } from "../services/sync.service"
 import {
   getMenuCategories,
-  getMenuItemsByCategory
+  getMenuItemsByCategory,
 } from "../services/menu.service"
 import { Order, OrderItem } from "../localdb"
 import LogoHeader from "../components/LogoHeader"
@@ -51,7 +51,6 @@ interface MenuAPICategory {
   updatedAt: string
 }
 
-
 const TableOrderPage = () => {
   const { tableNumber } = useParams<{ tableNumber: string }>()
   const tableNum: number = Number(tableNumber)
@@ -90,8 +89,6 @@ const TableOrderPage = () => {
       try {
         const categories = await getMenuCategories()
         setMenuCategories(categories)
-
-        
       } catch (error) {
         console.error("Error fetching menu categories:", error)
       }
@@ -317,11 +314,11 @@ const TableOrderPage = () => {
       console.warn("No items in order to send.")
       return
     }
-  
+
     // ✅ Fetch all menu data with correct typing
     const menuData = await fetch("http://localhost:5050/api/menu")
     const menuJson: MenuAPICategory[] = await menuData.json()
-  
+
     // ✅ Build itemId → superCategory map
     const itemCategoryMap: Record<string, string> = {}
     menuJson.forEach((cat) => {
@@ -329,41 +326,45 @@ const TableOrderPage = () => {
         itemCategoryMap[item._id] = cat.superCategory
       })
     })
-  
+
     const drinksItems: OrderItem[] = []
     const foodItems: OrderItem[] = []
-  
+
     order.items.forEach((item) => {
       const superCategory = itemCategoryMap[item.itemId]
-  
+
       if (!superCategory) {
         console.warn(`⚠️ Item with ID ${item.itemId} not found in menu.`)
         return
       }
-  
+
       if (superCategory === "Drinks") {
         drinksItems.push(item)
       } else {
         foodItems.push(item)
       }
     })
-  
+
     console.log("=== 🥤 Drinks Order ===")
     if (drinksItems.length > 0) {
       drinksItems.forEach((item) =>
         console.log(
-          `${item.name} (${item.variation}) x${item.quantity} - £${item.price.toFixed(2)}`
+          `${item.name} (${item.variation}) x${
+            item.quantity
+          } - £${item.price.toFixed(2)}`
         )
       )
     } else {
       console.log("No drinks items.")
     }
-  
+
     console.log("=== 🍽️ Food Order ===")
     if (foodItems.length > 0) {
       foodItems.forEach((item) =>
         console.log(
-          `${item.name} (${item.variation}) x${item.quantity} - £${item.price.toFixed(2)}`
+          `${item.name} (${item.variation}) x${
+            item.quantity
+          } - £${item.price.toFixed(2)}`
         )
       )
     } else {
@@ -384,7 +385,9 @@ const TableOrderPage = () => {
         {/* ✅ Bill Section (Left Panel) */}
         <div className="bill-section">
           <div className="bill-header">
-            <button className="print-btn" onClick={handlePrintBill}>Print Bill</button>
+            <button className="print-btn" onClick={handlePrintBill}>
+              Print Bill
+            </button>
             <span className="table-label">T{tableNum}</span>
             <button className="pay-btn">Pay</button>
           </div>
@@ -410,7 +413,7 @@ const TableOrderPage = () => {
                 {item.modifiers?.length ? (
                   <ul className="modifiers-list">
                     {item.modifiers.map((mod, idx) => (
-                      <li key={idx}>• {mod}</li>
+                      <li key={idx}> {mod}</li>
                     ))}
                   </ul>
                 ) : null}
@@ -432,7 +435,9 @@ const TableOrderPage = () => {
             >
               Gratuity
             </button>
-            <button className="send-btn" onClick={handleSendOrder}>Send</button>
+            <button className="send-btn" onClick={handleSendOrder}>
+              Send
+            </button>
           </div>
         </div>
 

@@ -35,6 +35,7 @@ const OrderItemSchema = new Schema<IOrderItem>(
     price: { type: Number, required: true, min: 0 },
     quantity: { type: Number, required: true, min: 1 },
     notes: { type: String, default: "" },
+    modifiers:{type: [String], default: []}
   },
   { _id: false } // ✅ Prevent MongoDB from auto-generating _id for items
 )
