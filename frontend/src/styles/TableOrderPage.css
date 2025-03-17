@@ -322,6 +322,48 @@
   background: darkgreen;
 }
 
+/* Gratuity Modal Specific */
+.gratuity-modal {
+  width: 400px; /* Consistent size with your design */
+  max-width: 90vw;
+}
+
+/* Modal Title */
+.modal-title {
+  margin-bottom: 15px;
+  font-size: 22px;
+  font-weight: bold;
+  color: white;
+}
+
+/* Radio Button Container */
+.gratuity-options {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+/* Radio Button Styling */
+.gratuity-radio {
+  font-size: 16px;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Input Field Styling */
+.gratuity-input {
+  width: 100%;
+  padding: 10px;
+  background: #2a2a2a;
+  border: 1px solid #555;
+  color: white;
+  font-size: 16px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
 /* ✅ Mobile Support */
 @media screen and (max-width: 768px) {
   /* ✅ Adjust Layout for Small Screens */

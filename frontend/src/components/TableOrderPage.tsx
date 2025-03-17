@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useParams } from "react-router-dom"
-import { getOrderByTable, removeOrderItem, cancelOrder } from "../services/orders.service"
+import {
+  getOrderByTable,
+  removeOrderItem,
+  cancelOrder,
+} from "../services/orders.service"
 import { handleOrderSubmission } from "../services/sync.service"
 import {
   getMenuCategories,
@@ -31,7 +35,7 @@ interface MenuCategory {
 const TableOrderPage = () => {
   const { tableNumber } = useParams<{ tableNumber: string }>()
   const tableNum: number = Number(tableNumber)
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   const [order, setOrder] = useState<Order | null>(null)
   const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
@@ -43,6 +47,12 @@ const TableOrderPage = () => {
   const [selectedModifiers, setSelectedModifiers] = useState<string[]>([])
   const [notes, setNotes] = useState<string>("")
   const [showModal, setShowModal] = useState<boolean>(false)
+
+  const [showGratuityModal, setShowGratuityModal] = useState(false)
+  const [gratuityType, setGratuityType] = useState<"percentage" | "amount">(
+    "percentage"
+  )
+  const [gratuityValue, setGratuityValue] = useState<number>(0)
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -200,19 +210,73 @@ const TableOrderPage = () => {
   }
 
   const handleCancelOrder = async () => {
-    if (!order) return;
-  
+    if (!order) return
+
     try {
-      await cancelOrder(order._id as string);
-      setOrder({ ...order, orderStatus: "cancelled" });
-      alert("Order cancelled successfully.");
+      await cancelOrder(order._id as string)
+      setOrder({ ...order, orderStatus: "cancelled" })
+      alert("Order cancelled successfully.")
       navigate("/tables")
     } catch (error) {
-      console.error("Failed to cancel order:", error);
-      alert("Failed to cancel order. Please try again.");
+      console.error("Failed to cancel order:", error)
+      alert("Failed to cancel order. Please try again.")
     }
-  };
-  
+  }
+
+  const handleAddGratuity = async () => {
+    if (!order) return
+
+    if (!gratuityValue || gratuityValue <= 0) {
+      alert("Please enter a valid gratuity value.")
+      return
+    }
+
+    let gratuityAmount = gratuityValue
+
+    // Convert % to £ based on current totalPrice
+    if (gratuityType === "percentage") {
+      gratuityAmount = (order.totalPrice * gratuityValue) / 100
+    }
+
+    const generateObjectId = (): string =>
+      Array.from(crypto.getRandomValues(new Uint8Array(12)))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("")
+
+    // Create a new gratuity item
+    const gratuityItem: OrderItem = {
+      orderItemId: crypto.randomUUID(),
+      itemId: generateObjectId(),
+      name: "Gratuity",
+      variation: "flat", // ✅ Required by TS & backend
+      price: parseFloat(gratuityAmount.toFixed(2)),
+      quantity: 1,
+      modifiers: [], // ✅ Add empty array if required
+      notes: "Gratuity", // ✅ Optional but useful
+    }
+
+    // Add gratuity item to order
+    const updatedItems = [...order.items, gratuityItem]
+    const updatedTotal = order.totalPrice + gratuityItem.price
+
+    const updatedOrder: Order = {
+      ...order,
+      items: updatedItems,
+      totalPrice: updatedTotal,
+      updatedAt: new Date(),
+    }
+
+    try {
+      // Persist updated order to MongoDB
+      await handleOrderSubmission(updatedOrder)
+      setOrder(updatedOrder)
+      setShowGratuityModal(false)
+      alert("Gratuity added successfully.")
+    } catch (error) {
+      console.error("Error saving gratuity to DB:", error)
+      alert("Failed to save gratuity. Please try again.")
+    }
+  }
 
   return (
     <div className="table-order-container">
@@ -266,8 +330,15 @@ const TableOrderPage = () => {
             <span>£{order?.totalPrice.toFixed(2) || "0.00"}</span>
           </div>
           <div className="bill-actions">
-            <button className="cancel-btn" onClick={handleCancelOrder}>Cancel</button>
-            <button className="gratuity-btn">Gratuity</button>
+            <button className="cancel-btn" onClick={handleCancelOrder}>
+              Cancel
+            </button>
+            <button
+              className="gratuity-btn"
+              onClick={() => setShowGratuityModal(true)}
+            >
+              Gratuity
+            </button>
             <button className="send-btn">Send</button>
           </div>
         </div>
@@ -313,7 +384,56 @@ const TableOrderPage = () => {
         </div>
       </div>
 
-      {/* ✅ Pop-up for Selecting Variations & Modifiers */}
+      {showGratuityModal && (
+        <div className="modal-overlay">
+          <div className="modal-content gratuity-modal">
+            <button
+              className="close-btn"
+              onClick={() => setShowGratuityModal(false)}
+            >
+              ✖
+            </button>
+            <h2 className="modal-title">Add Gratuity</h2>
+
+            <div className="gratuity-options">
+              <label className="gratuity-radio">
+                <input
+                  type="radio"
+                  name="gratuityType"
+                  value="percentage"
+                  checked={gratuityType === "percentage"}
+                  onChange={() => setGratuityType("percentage")}
+                />
+                Percentage (%)
+              </label>
+              <label className="gratuity-radio">
+                <input
+                  type="radio"
+                  name="gratuityType"
+                  value="amount"
+                  checked={gratuityType === "amount"}
+                  onChange={() => setGratuityType("amount")}
+                />
+                Fixed (£)
+              </label>
+            </div>
+
+            <input
+              type="number"
+              min="0"
+              value={gratuityValue}
+              onChange={(e) => setGratuityValue(parseFloat(e.target.value))}
+              placeholder="Enter value"
+              className="gratuity-input"
+            />
+
+            <button className="add-btn" onClick={handleAddGratuity}>
+              Add Gratuity
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ✅ Pop-up for Selecting Variations, Modifiers & Notes */}
       {showModal && selectedItem && (
         <div className="modal-overlay">
