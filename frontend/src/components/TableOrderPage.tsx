@@ -13,6 +13,8 @@ import {
 } from "../services/menu.service"
 import { Order, OrderItem } from "../localdb"
 import LogoHeader from "../components/LogoHeader"
+import { generatePrintableBillHTML } from "../services/bill.service"
+import { getServerNameFromToken } from "../services/auth.service"
 import "../styles/TableOrderPage.css"
 
 interface MenuItem {
@@ -70,6 +72,8 @@ const TableOrderPage = () => {
       try {
         const categories = await getMenuCategories()
         setMenuCategories(categories)
+
+        
       } catch (error) {
         console.error("Error fetching menu categories:", error)
       }
@@ -271,12 +275,81 @@ const TableOrderPage = () => {
       await handleOrderSubmission(updatedOrder)
       setOrder(updatedOrder)
       setShowGratuityModal(false)
-      alert("Gratuity added successfully.")
     } catch (error) {
       console.error("Error saving gratuity to DB:", error)
       alert("Failed to save gratuity. Please try again.")
     }
   }
+
+  const handlePrintBill = () => {
+    if (!order) return
+    const serverName = getServerNameFromToken()
+    const billHTML = generatePrintableBillHTML(order, serverName)
+    const printWindow = window.open("", "_blank")
+    if (printWindow) {
+      printWindow.document.write(billHTML)
+      printWindow.document.close()
+    } else {
+      alert("Unable to open print window. Please check your popup blocker.")
+    }
+  }
+
+  const handleSendOrder = () => {
+    if (!order || order.items.length === 0) {
+      console.warn("No items in order to send.");
+      return;
+    }
+  
+    if (menuCategories.length === 0) {
+      console.warn("Menu categories not loaded.");
+      return;
+    }
+  
+    const drinksItems: OrderItem[] = [];
+    const otherItems: OrderItem[] = [];
+  
+    order.items.forEach((orderItem) => {
+      let foundSuperCategory: string | null = null;
+  
+      // ✅ Search through all menuCategories to find item's superCategory
+      for (const category of menuCategories) {
+        const match = menuItems.find(
+          (menuItem) => menuItem.itemId === orderItem.itemId
+        );
+  
+        if (match) {
+          foundSuperCategory = category.superCategory;
+          break;
+        }
+      }
+  
+      // ✅ Categorize based on superCategory
+      if (foundSuperCategory?.toLowerCase() === "drinks") {
+        drinksItems.push(orderItem);
+      } else {
+        otherItems.push(orderItem);
+      }
+    });
+  
+    // ✅ Formatter for pretty logs
+    const formatItems = (items: OrderItem[]) => {
+      return items
+        .map((item) => {
+          const base = `${item.name} ${item.variation ?? ""} | Qty: ${item.quantity} | £${item.price.toFixed(2)}`;
+          const mods = item.modifiers?.length
+            ? `  Modifiers: ${item.modifiers.join(", ")}`
+            : "";
+          const note = item.notes ? `  Note: ${item.notes}` : "";
+          return `${base}${mods ? `\n${mods}` : ""}${note ? `\n${note}` : ""}`;
+        })
+        .join("\n---\n");
+    };
+  
+    // ✅ Final logs
+    console.log("🥤 Drinks Order:\n======================\n" + (drinksItems.length ? formatItems(drinksItems) : "None"));
+    console.log("🍽️ Food Order:\n======================\n" + (otherItems.length ? formatItems(otherItems) : "None"));
+  };
+  
 
   return (
     <div className="table-order-container">
@@ -291,7 +364,7 @@ const TableOrderPage = () => {
         {/* ✅ Bill Section (Left Panel) */}
         <div className="bill-section">
           <div className="bill-header">
-            <button className="print-btn">Print Bill</button>
+            <button className="print-btn" onClick={handlePrintBill}>Print Bill</button>
             <span className="table-label">T{tableNum}</span>
             <button className="pay-btn">Pay</button>
           </div>
@@ -339,7 +412,7 @@ const TableOrderPage = () => {
             >
               Gratuity
             </button>
-            <button className="send-btn">Send</button>
+            <button className="send-btn" onClick={handleSendOrder}>Send</button>
           </div>
         </div>
 

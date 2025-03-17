@@ -70,13 +70,16 @@
 
 .print-btn,
 .pay-btn {
-  background-color: #4caf50;
   padding: 8px 12px;
   border-radius: 5px;
   border: none;
   cursor: pointer;
   color: white;
   font-weight: bold;
+}
+
+.print-btn{
+  background-color: #1194FF;
 }
 
 .pay-btn {
