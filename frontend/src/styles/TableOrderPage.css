@@ -79,8 +79,8 @@
   font-weight: bold;
 }
 
-.print-btn{
-  background-color: #1194FF;
+.print-btn {
+  background-color: #1194ff;
 }
 
 .pay-btn {
@@ -269,10 +269,48 @@
   width: 450px; /* ✅ More horizontal layout */
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
   position: relative;
+  color: white;
+}
+
+/* 🎯 Modal Title */
+.modal-content h2 {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* 🎯 Modal Headings (e.g., Select Variation, Modifiers, Notes) */
+.modal-content h4 {
+  margin-top: 15px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.modifier-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+/* 🎯 Notes Input */
+.notes-input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  background: #2a2a2a;
+  border: 1px solid #555;
+  border-radius: 5px;
+  color: white;
+  font-size: 14px;
+  resize: vertical;
 }
 
 /* ✅ Close Button Position */
-.modal-content .close-btn {
+.close-btn {
   position: absolute;
   top: 10px;
   left: 10px;
@@ -286,16 +324,18 @@
 /* ✅ Inline "Select Variation" */
 .modal-options {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
+  justify-content: flex-start;
+  margin-bottom: 10px;
 }
 
 .modal-content label {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  margin-right: 15px;
+  gap: 6px;
   font-size: 16px;
-  color: white;
+  cursor: pointer;
 }
 
 /* ✅ Fix Special Instructions Input Width */
@@ -314,12 +354,15 @@
 .add-btn {
   width: 100%;
   padding: 12px;
-  background: green;
+  margin-top: 20px;
+  background: #28a745;
   color: white;
-  font-size: 18px;
+  font-size: 16px;
   border: none;
+  border-radius: 6px;
   cursor: pointer;
-  margin-top: 10px;
+  font-weight: bold;
+  transition: background 0.3s ease;
 }
 
 .add-btn:hover {

@@ -534,74 +534,74 @@ const TableOrderPage = () => {
 
       {/* ✅ Pop-up for Selecting Variations, Modifiers & Notes */}
       {showModal && selectedItem && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            {/* ✅ Close Button */}
-            <button className="close-btn" onClick={() => setShowModal(false)}>
-              ✖
-            </button>
+  <div className="modal-overlay">
+    <div className="modal-content">
+      {/* ✅ Close Button */}
+      <button className="close-btn" onClick={() => setShowModal(false)}>
+        ✖
+      </button>
 
-            {/* ✅ Item Name */}
-            <h2>{selectedItem.name}</h2>
+      {/* ✅ Item Name */}
+      <h2 className="modal-title">{selectedItem.name}</h2>
 
-            {/* ✅ Variations Selection */}
-            <h4>Select Variation:</h4>
-            <div className="modal-options">
-              <h4>Select Variation:</h4>
-              {selectedItem.variations.map((variation, idx) => (
-                <label key={idx}>
-                  <input
-                    type="radio"
-                    name="variation"
-                    value={variation.type}
-                    checked={selectedVariation === variation.type}
-                    onChange={() => setSelectedVariation(variation.type)}
-                  />
-                  {variation.type} - £{variation.price.toFixed(2)}
-                </label>
-              ))}
-            </div>
-
-            {/* ✅ Modifiers Selection */}
-            {selectedItem.modifiers && selectedItem.modifiers.length > 0 && (
-              <>
-                <h4>Add Modifiers:</h4>
-                {selectedItem.modifiers.map((modifier, idx) => (
-                  <label key={idx} className="modifier-label">
-                    <input
-                      type="checkbox"
-                      value={modifier}
-                      checked={selectedModifiers.includes(modifier)}
-                      onChange={() =>
-                        setSelectedModifiers((prev) =>
-                          prev.includes(modifier)
-                            ? prev.filter((m) => m !== modifier)
-                            : [...prev, modifier]
-                        )
-                      }
-                    />
-                    {modifier}
-                  </label>
-                ))}
-              </>
-            )}
-
-            {/* ✅ Notes Field */}
-            <h4>Add Notes:</h4>
-            <textarea
-              className="notes-input"
-              placeholder="Special instructions (optional)"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
+      {/* ✅ Variations Selection */}
+      <h4>Select Variation:</h4>
+      <div className="modal-options">
+        {selectedItem.variations.map((variation, idx) => (
+          <label key={idx}>
+            <input
+              type="radio"
+              name="variation"
+              value={variation.type}
+              checked={selectedVariation === variation.type}
+              onChange={() => setSelectedVariation(variation.type)}
             />
+            {variation.type} - £{variation.price.toFixed(2)}
+          </label>
+        ))}
+      </div>
 
-            {/* ✅ Add Button */}
-            <button className="add-btn" onClick={handleAddItem}>
-              Add to Order
-            </button>
-          </div>
-        </div>
+      {/* ✅ Modifiers Selection */}
+      {selectedItem.modifiers && selectedItem.modifiers.length > 0 && (
+        <>
+          <h4>Add Modifiers:</h4>
+          {selectedItem.modifiers.map((modifier, idx) => (
+            <label key={idx} className="modifier-label">
+              <input
+                type="checkbox"
+                value={modifier}
+                checked={selectedModifiers.includes(modifier)}
+                onChange={() =>
+                  setSelectedModifiers((prev) =>
+                    prev.includes(modifier)
+                      ? prev.filter((m) => m !== modifier)
+                      : [...prev, modifier]
+                  )
+                }
+              />
+              {modifier}
+            </label>
+          ))}
+        </>
       )}
+
+      {/* ✅ Notes Field */}
+      <h4>Add Notes:</h4>
+      <textarea
+        className="notes-input"
+        placeholder="Special instructions (optional)"
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
+      />
+
+      {/* ✅ Add Button */}
+      <button className="add-btn" onClick={handleAddItem}>
+        Add to Order
+      </button>
+    </div>
+  </div>
+)}
+
     </div>
   )
 }
