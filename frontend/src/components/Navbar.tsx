@@ -51,11 +51,6 @@ const Navbar = () => {
             </Link>
           </li>
           <li>
-            <Link to="/settings" onClick={toggleSidebar}>
-              Settings
-            </Link>
-          </li>
-          <li>
             <Link to="/inventory" onClick={toggleSidebar}>
               Inventory
             </Link>
