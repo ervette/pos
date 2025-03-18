@@ -18,7 +18,7 @@ export interface Order {
   tableNumber: number
   items: OrderItem[] // ✅ Ensure Order.items uses OrderItem[]
   totalPrice: number
-  orderStatus: "open" | "complete" | "cancelled"
+  orderStatus: "open" | "paid_other" | "paid_cash" | "paid_card" | "cancelled"
   createdAt: Date
   updatedAt: Date
 }

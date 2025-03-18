@@ -5,6 +5,7 @@ import Dashboard from "./components/Dashboard"
 import Navbar from "./components/Navbar"
 import TablesPage from "./components/TablesPage"
 import TableOrderPage from "./components/TableOrderPage"
+import ArchivePage from "./components/ArchivePage"
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
                     path="/table/:tableNumber"
                     element={<TableOrderPage />}
                   />
+                  <Route path="/archive" element={<ArchivePage />} />
                   {/* Add other protected routes here */}
                 </Routes>
               </>

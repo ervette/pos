@@ -15,7 +15,7 @@
     justify-content: space-between; /* Keep Logo left, Title centered */
     position: relative; /* Allows absolute positioning inside */
     height: 55px; /* Match logo height */
-    margin-bottom: 0; /* Remove unnecessary bottom spacing */
+    margin-bottom: 6vh;
   }
   
   /* Dashboard Title - Move it Higher */

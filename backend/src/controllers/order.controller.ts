@@ -52,7 +52,7 @@ export const createOrder = async (req: Request, res: Response) => {
 // Get all orders
 export const getOrders = async (req: Request, res: Response) => {
   try {
-    const { tableNumber, status } = req.query
+    const { tableNumber, status, limit } = req.query
 
     const filter: Record<string, unknown> = {}
 
@@ -64,7 +64,16 @@ export const getOrders = async (req: Request, res: Response) => {
       filter.orderStatus = status
     }
 
-    const orders = await Order.find(filter)
+    let query = Order.find(filter).sort({ createdAt: -1 }) // ✅ Sort by newest
+
+    if (limit) {
+      const parsedLimit = parseInt(limit as string, 10)
+      if (!isNaN(parsedLimit) && parsedLimit > 0) {
+        query = query.limit(parsedLimit)
+      }
+    }
+
+    const orders = await query
     res.json(orders)
   } catch (error) {
     console.error("Error fetching orders:", error)
@@ -132,6 +141,7 @@ export const deleteOrder = async (
   res: Response
 ): Promise<Response> => {
   try {
+    console.log("Attempting to delete order with ID:", req.params.id)
     const deletedOrder = await Order.findByIdAndDelete(req.params.id)
     if (!deletedOrder) {
       return res.status(404).json({ error: "Order not found" })
@@ -198,11 +208,9 @@ export const removeOrderItem = async (req: Request, res: Response) => {
     return res.json({ message: "Item removed successfully", order })
   } catch (error) {
     console.error("❌ Error removing item:", error)
-    return res
-      .status(500)
-      .json({
-        error: "Failed to remove item",
-        details: (error as Error).message,
-      })
+    return res.status(500).json({
+      error: "Failed to remove item",
+      details: (error as Error).message,
+    })
   }
 }

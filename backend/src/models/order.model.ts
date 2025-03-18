@@ -16,7 +16,7 @@ export interface IOrder extends Document {
   tableNumber?: number
   items: IOrderItem[]
   totalPrice: number
-  orderStatus: "open" | "completed" | "cancelled"
+  orderStatus: "open" | "paid_other" | "paid_cash" | "paid_card" | "cancelled"
   createdAt: Date
   updatedAt: Date
 }
@@ -54,7 +54,7 @@ const OrderSchema = new Schema<IOrder>(
     totalPrice: { type: Number, required: true, min: 0 },
     orderStatus: {
       type: String,
-      enum: ["open", "completed", "cancelled"],
+      enum: ["open", "paid_other", "paid_cash", "paid_card", "cancelled"],
       default: "open",
     },
   },
