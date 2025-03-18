@@ -383,7 +383,7 @@ const TableOrderPage = () => {
     console.log("🔄 Changing status to:", selectedPayment)
     await changeOrderStatus(order.orderId, selectedPayment)
   
-    // Optional: Refetch to confirm change visually before navigating
+    // Optionally refetch order
     try {
       const updatedOrder = await getOrderByTable(tableNum)
       console.log("✅ Refetched order status:", updatedOrder?.orderStatus)
@@ -393,6 +393,7 @@ const TableOrderPage = () => {
   
     navigate("/tables")
   }
+  
 
   return (
     <div className="table-order-container">

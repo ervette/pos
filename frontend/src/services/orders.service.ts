@@ -139,7 +139,6 @@ export const changeOrderStatus = async (
   newStatus: "open" | "paid_other" | "paid_cash" | "paid_card" | "cancelled"
 ): Promise<void> => {
   try {
-    // ✅ Fix: Query by orderId instead of _id
     const existingOrder = await db.orders
       .where("orderId")
       .equals(orderId)
@@ -151,20 +150,19 @@ export const changeOrderStatus = async (
     }
 
     // Update status locally
-    const updatedOrder: Order = {
+    const updatedOrder = {
       ...existingOrder,
       orderStatus: newStatus,
       updatedAt: new Date(),
     }
 
-    // ✅ Save to IndexedDB
     await db.orders.put(updatedOrder)
     console.log("✅ Order status updated in IndexedDB:", updatedOrder)
 
-    // ✅ Update in MongoDB
+    // Send update to MongoDB using orderId
     if (navigator.onLine) {
       const response = await fetch(
-        `http://localhost:5050/api/orders/${updatedOrder._id}`,
+        `http://localhost:5050/api/orders/orderId/${orderId}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -173,10 +171,10 @@ export const changeOrderStatus = async (
       )
 
       if (!response.ok) {
-        throw new Error("Failed to update order status on server")
+        throw new Error("Failed to update status on server")
       }
 
-      console.log("✅ Order status updated in MongoDB:", updatedOrder._id)
+      console.log("✅ Order status updated in MongoDB via orderId:", orderId)
     } else {
       console.log("📴 Offline: Status updated locally only.")
     }

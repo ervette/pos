@@ -214,3 +214,32 @@ export const removeOrderItem = async (req: Request, res: Response) => {
     })
   }
 }
+
+export const updateOrderByOrderId = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const { orderId } = req.params
+    const { orderStatus } = req.body
+
+    if (!orderStatus) {
+      return res.status(400).json({ error: "Missing orderStatus" })
+    }
+
+    const updatedOrder = await Order.findOneAndUpdate(
+      { orderId },
+      { orderStatus, updatedAt: new Date() },
+      { new: true }
+    )
+
+    if (!updatedOrder) {
+      return res.status(404).json({ error: "Order not found" })
+    }
+
+    return res.json(updatedOrder)
+  } catch (error: unknown) {
+    console.error("Error updating order status by orderId:", error)
+    return res.status(500).json({ error: "Server error" })
+  }
+}

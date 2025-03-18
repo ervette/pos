@@ -5,7 +5,8 @@ import {
   getOrderById,
   updateOrder,
   deleteOrder,
-  removeOrderItem
+  removeOrderItem,
+  updateOrderByOrderId
 } from "../controllers/order.controller"
 
 const router = express.Router()
@@ -23,6 +24,7 @@ const asyncHandler =
 
 // CRUD endpoints for orders
 router.delete("/:orderId/items/:orderItemId", asyncHandler(removeOrderItem))
+router.put("/orderId/:orderId", asyncHandler(updateOrderByOrderId))
 
 router.post("/", asyncHandler(createOrder)) // Create
 router.get("/", asyncHandler(getOrders)) // Read (all)
