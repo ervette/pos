@@ -5,6 +5,7 @@ import {
   getOrderByTable,
   removeOrderItem,
   cancelOrder,
+  changeOrderStatus,
 } from "../services/orders.service"
 import { handleOrderSubmission } from "../services/sync.service"
 import {
@@ -72,6 +73,10 @@ const TableOrderPage = () => {
     "percentage"
   )
   const [gratuityValue, setGratuityValue] = useState<number>(0)
+  const [showPayModal, setShowPayModal] = useState(false)
+  const [selectedPayment, setSelectedPayment] = useState<
+    "paid_card" | "paid_cash" | "paid_other"
+  >("paid_card")
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -372,6 +377,23 @@ const TableOrderPage = () => {
     }
   }
 
+  const handlePay = async () => {
+    if (!order) return
+  
+    console.log("🔄 Changing status to:", selectedPayment)
+    await changeOrderStatus(order.orderId, selectedPayment)
+  
+    // Optional: Refetch to confirm change visually before navigating
+    try {
+      const updatedOrder = await getOrderByTable(tableNum)
+      console.log("✅ Refetched order status:", updatedOrder?.orderStatus)
+    } catch (err) {
+      console.warn("⚠️ Failed to refetch order after payment.", err)
+    }
+  
+    navigate("/tables")
+  }
+
   return (
     <div className="table-order-container">
       <div className="table-order-header">
@@ -389,7 +411,9 @@ const TableOrderPage = () => {
               Print Bill
             </button>
             <span className="table-label">T{tableNum}</span>
-            <button className="pay-btn">Pay</button>
+            <button className="pay-btn" onClick={() => setShowPayModal(true)}>
+              Pay
+            </button>
           </div>
           <div className="bill-table">
             <div className="bill-row header">
@@ -534,74 +558,133 @@ const TableOrderPage = () => {
 
       {/* ✅ Pop-up for Selecting Variations, Modifiers & Notes */}
       {showModal && selectedItem && (
-  <div className="modal-overlay">
-    <div className="modal-content">
-      {/* ✅ Close Button */}
-      <button className="close-btn" onClick={() => setShowModal(false)}>
-        ✖
-      </button>
+        <div className="modal-overlay">
+          <div className="modal-content">
+            {/* ✅ Close Button */}
+            <button className="close-btn" onClick={() => setShowModal(false)}>
+              ✖
+            </button>
 
-      {/* ✅ Item Name */}
-      <h2 className="modal-title">{selectedItem.name}</h2>
+            {/* ✅ Item Name */}
+            <h2 className="modal-title">{selectedItem.name}</h2>
 
-      {/* ✅ Variations Selection */}
-      <h4>Select Variation:</h4>
-      <div className="modal-options">
-        {selectedItem.variations.map((variation, idx) => (
-          <label key={idx}>
-            <input
-              type="radio"
-              name="variation"
-              value={variation.type}
-              checked={selectedVariation === variation.type}
-              onChange={() => setSelectedVariation(variation.type)}
+            {/* ✅ Variations Selection */}
+            <h4>Select Variation:</h4>
+            <div className="modal-options">
+              {selectedItem.variations.map((variation, idx) => (
+                <label key={idx}>
+                  <input
+                    type="radio"
+                    name="variation"
+                    value={variation.type}
+                    checked={selectedVariation === variation.type}
+                    onChange={() => setSelectedVariation(variation.type)}
+                  />
+                  {variation.type} - £{variation.price.toFixed(2)}
+                </label>
+              ))}
+            </div>
+
+            {/* ✅ Modifiers Selection */}
+            {selectedItem.modifiers && selectedItem.modifiers.length > 0 && (
+              <>
+                <h4>Add Modifiers:</h4>
+                {selectedItem.modifiers.map((modifier, idx) => (
+                  <label key={idx} className="modifier-label">
+                    <input
+                      type="checkbox"
+                      value={modifier}
+                      checked={selectedModifiers.includes(modifier)}
+                      onChange={() =>
+                        setSelectedModifiers((prev) =>
+                          prev.includes(modifier)
+                            ? prev.filter((m) => m !== modifier)
+                            : [...prev, modifier]
+                        )
+                      }
+                    />
+                    {modifier}
+                  </label>
+                ))}
+              </>
+            )}
+
+            {/* ✅ Notes Field */}
+            <h4>Add Notes:</h4>
+            <textarea
+              className="notes-input"
+              placeholder="Special instructions (optional)"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
             />
-            {variation.type} - £{variation.price.toFixed(2)}
-          </label>
-        ))}
-      </div>
 
-      {/* ✅ Modifiers Selection */}
-      {selectedItem.modifiers && selectedItem.modifiers.length > 0 && (
-        <>
-          <h4>Add Modifiers:</h4>
-          {selectedItem.modifiers.map((modifier, idx) => (
-            <label key={idx} className="modifier-label">
-              <input
-                type="checkbox"
-                value={modifier}
-                checked={selectedModifiers.includes(modifier)}
-                onChange={() =>
-                  setSelectedModifiers((prev) =>
-                    prev.includes(modifier)
-                      ? prev.filter((m) => m !== modifier)
-                      : [...prev, modifier]
-                  )
-                }
-              />
-              {modifier}
-            </label>
-          ))}
-        </>
+            {/* ✅ Add Button */}
+            <button className="add-btn" onClick={handleAddItem}>
+              Add to Order
+            </button>
+          </div>
+        </div>
       )}
+      {showPayModal && order && (
+        <div className="modal-overlay">
+          <div className="modal-content pay-modal">
+            <button
+              className="close-btn"
+              onClick={() => setShowPayModal(false)}
+            >
+              ✖
+            </button>
+            <h2 className="modal-title">Payment</h2>
 
-      {/* ✅ Notes Field */}
-      <h4>Add Notes:</h4>
-      <textarea
-        className="notes-input"
-        placeholder="Special instructions (optional)"
-        value={notes}
-        onChange={(e) => setNotes(e.target.value)}
-      />
+            {/* Split Bill Display */}
+            <div className="split-bill-section">
+              <h4>Split Bill:</h4>
+              <p>2 people: £{(order.totalPrice / 2).toFixed(2)}</p>
+              <p>3 people: £{(order.totalPrice / 3).toFixed(2)}</p>
+              <p>4 people: £{(order.totalPrice / 4).toFixed(2)}</p>
+            </div>
 
-      {/* ✅ Add Button */}
-      <button className="add-btn" onClick={handleAddItem}>
-        Add to Order
-      </button>
-    </div>
-  </div>
-)}
+            {/* Payment Method Radio */}
+            <div className="payment-methods">
+              <label>
+                <input
+                  type="radio"
+                  name="payment"
+                  value="paid_card"
+                  checked={selectedPayment === "paid_card"}
+                  onChange={() => setSelectedPayment("paid_card")}
+                />
+                Card
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="payment"
+                  value="paid_cash"
+                  checked={selectedPayment === "paid_cash"}
+                  onChange={() => setSelectedPayment("paid_cash")}
+                />
+                Cash
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="payment"
+                  value="paid_other"
+                  checked={selectedPayment === "paid_other"}
+                  onChange={() => setSelectedPayment("paid_other")}
+                />
+                Other
+              </label>
+            </div>
 
+            {/* Pay Button */}
+            <button className="pay-confirm-btn" onClick={handlePay}>
+              Pay
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

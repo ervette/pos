@@ -124,12 +124,63 @@ export const cancelOrder = async (_id: string) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ orderStatus: "cancelled" }),
-  });
+  })
 
   if (!response.ok) {
-    throw new Error("Failed to cancel the order");
+    throw new Error("Failed to cancel the order")
   }
 
-  const data = await response.json();
-  return data;
-};
+  const data = await response.json()
+  return data
+}
+
+export const changeOrderStatus = async (
+  orderId: string,
+  newStatus: "open" | "paid_other" | "paid_cash" | "paid_card" | "cancelled"
+): Promise<void> => {
+  try {
+    // ✅ Fix: Query by orderId instead of _id
+    const existingOrder = await db.orders
+      .where("orderId")
+      .equals(orderId)
+      .first()
+
+    if (!existingOrder) {
+      console.error("Order not found in local DB:", orderId)
+      return
+    }
+
+    // Update status locally
+    const updatedOrder: Order = {
+      ...existingOrder,
+      orderStatus: newStatus,
+      updatedAt: new Date(),
+    }
+
+    // ✅ Save to IndexedDB
+    await db.orders.put(updatedOrder)
+    console.log("✅ Order status updated in IndexedDB:", updatedOrder)
+
+    // ✅ Update in MongoDB
+    if (navigator.onLine) {
+      const response = await fetch(
+        `http://localhost:5050/api/orders/${updatedOrder._id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderStatus: newStatus }),
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error("Failed to update order status on server")
+      }
+
+      console.log("✅ Order status updated in MongoDB:", updatedOrder._id)
+    } else {
+      console.log("📴 Offline: Status updated locally only.")
+    }
+  } catch (error) {
+    console.error("❌ Failed to change order status:", error)
+  }
+}

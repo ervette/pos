@@ -411,6 +411,90 @@
   margin-bottom: 10px;
 }
 
+/* Payment Modal Styling */
+.payment-modal {
+  background-color: #1a1a1a;
+  padding: 20px;
+  border-radius: 8px;
+  width: 450px;
+  max-width: 90vw;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  position: relative;
+  color: white;
+}
+
+.payment-modal h2 {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+/* Close Button */
+.payment-modal .close-btn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* Split Options */
+.split-options {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.split-button {
+  flex: 1;
+  margin: 0 5px;
+  padding: 10px;
+  background-color: #2b2b2b;
+  border: 1px solid #555;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  text-align: center;
+  font-weight: bold;
+}
+
+.split-button:hover {
+  background-color: #3a3a3a;
+}
+
+/* Payment Methods */
+.payment-methods {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+
+.payment-radio {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Pay Button */
+.pay-confirm-btn {
+  width: 100%;
+  padding: 12px;
+  background: green;
+  color: white;
+  font-size: 18px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.pay-confirm-btn:hover {
+  background: darkgreen;
+}
+
 /* ✅ Mobile Support */
 @media screen and (max-width: 768px) {
   /* ✅ Adjust Layout for Small Screens */
@@ -488,5 +572,23 @@
   .add-btn {
     font-size: 16px;
     padding: 10px;
+  }
+
+  .payment-modal {
+    width: 90%;
+    max-width: 350px;
+    padding: 15px;
+  }
+  .split-options {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .split-button {
+    margin: 0;
+    padding: 8px;
+  }
+  .payment-methods {
+    flex-direction: column;
+    gap: 10px;
   }
 }
