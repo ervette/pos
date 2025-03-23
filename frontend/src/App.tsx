@@ -6,6 +6,7 @@ import Navbar from "./components/Navbar"
 import TablesPage from "./components/TablesPage"
 import TableOrderPage from "./components/TableOrderPage"
 import ArchivePage from "./components/ArchivePage"
+import InventoryPage from "./components/InventoryPage"
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
                     path="/table/:tableNumber"
                     element={<TableOrderPage />}
                   />
+                  <Route path="/inventory" element={<InventoryPage />} />
                   <Route path="/archive" element={<ArchivePage />} />
                   {/* Add other protected routes here */}
                 </Routes>

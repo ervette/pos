@@ -21,6 +21,6 @@ html, body {
 
 #root {
   height: 100%;
-  display: flex;
-  justify-content: center;
+  /* display: flex;
+  justify-content: center; */
 }
