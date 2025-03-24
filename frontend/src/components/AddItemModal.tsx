@@ -9,7 +9,7 @@ import {
 
 interface AddItemModalProps {
   onClose: () => void
-  onSave: () => void // Adjust type based on your backend
+  onSave: () => void
   superCategories: string[]
   subCategories: string[]
 }
@@ -23,7 +23,7 @@ const AddItemModal = ({
   const [subCategory, setSubCategory] = useState("")
   const [itemName, setItemName] = useState("")
   const [variations, setVariations] = useState([{ type: "", price: "" }])
-  const [modifiers, setModifiers] = useState([{ type: "", price: "" }])
+  const [modifiers, setModifiers] = useState([""])
   const [categories, setCategories] = useState<MenuCategory[]>([])
   const [filteredSubCategories, setFilteredSubCategories] = useState<string[]>(
     []
@@ -40,7 +40,7 @@ const AddItemModal = ({
     }
 
     fetchCategories()
-  }, []) // Run only once when modal mounts
+  }, [])
 
   useEffect(() => {
     if (superCategory) {
@@ -53,21 +53,17 @@ const AddItemModal = ({
 
   const handleVariationChange = (
     index: number,
-    field: string,
+    field: "type" | "price",
     value: string
   ) => {
     const updated = [...variations]
-    updated[index][field as "type" | "price"] = value
+    updated[index][field] = value
     setVariations(updated)
   }
 
-  const handleModifierChange = (
-    index: number,
-    field: string,
-    value: string
-  ) => {
+  const handleModifierChange = (index: number, value: string) => {
     const updated = [...modifiers]
-    updated[index][field as "type" | "price"] = value
+    updated[index] = value
     setModifiers(updated)
   }
 
@@ -76,13 +72,11 @@ const AddItemModal = ({
   const removeVariation = (index: number) =>
     setVariations(variations.filter((_, i) => i !== index))
 
-  const addModifier = () =>
-    setModifiers([...modifiers, { type: "", price: "" }])
+  const addModifier = () => setModifiers([...modifiers, ""])
   const removeModifier = (index: number) =>
     setModifiers(modifiers.filter((_, i) => i !== index))
 
   const handleSave = async () => {
-    // 🔍 Basic validation
     if (!superCategory.trim()) {
       alert("Supercategory is required.")
       return
@@ -103,7 +97,7 @@ const AddItemModal = ({
       return
     }
 
-    // Construct payload (same as before)
+    // 🔥 Construct payload for backend
     const payload: IMenuItemPayload = {
       superCategory,
       subCategory,
@@ -112,10 +106,9 @@ const AddItemModal = ({
         type: v.type.trim(),
         price: parseFloat(v.price),
       })),
-      modifiers: modifiers.map((m) => ({
-        type: m.type.trim(),
-        price: parseFloat(m.price),
-      })),
+      modifiers: modifiers
+        .filter((mod) => mod.trim() !== "")
+        .map((mod) => mod.trim()), // Ensure strings only
     }
 
     try {
@@ -136,6 +129,7 @@ const AddItemModal = ({
         </button>
         <h2 className="modal-title">Add Item</h2>
 
+        {/* Categories Row */}
         <div className="category-inputs">
           <div className="input-group">
             <label>Supercategory</label>
@@ -218,19 +212,9 @@ const AddItemModal = ({
           <div className="dynamic-row" key={index}>
             <input
               type="text"
-              placeholder="Type"
-              value={modifier.type}
-              onChange={(e) =>
-                handleModifierChange(index, "type", e.target.value)
-              }
-            />
-            <input
-              type="number"
-              placeholder="£ Price"
-              value={modifier.price}
-              onChange={(e) =>
-                handleModifierChange(index, "price", e.target.value)
-              }
+              placeholder="Modifier Type"
+              value={modifier}
+              onChange={(e) => handleModifierChange(index, e.target.value)}
             />
             {index > 0 && (
               <button onClick={() => removeModifier(index)}>Remove</button>

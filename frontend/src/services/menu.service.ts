@@ -38,7 +38,7 @@ export interface IMenuItemPayload {
   subCategory: string;
   itemName: string;
   variations: IVariationInput[];
-  modifiers: IModifierInput[];
+  modifiers: string[];
 }
 
 export const getMenuCategories = async (): Promise<MenuCategory[]> => {
