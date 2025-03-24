@@ -5,6 +5,7 @@ import {
 } from "../services/menu.service"
 import { MenuCategory, MenuItem } from "../services/menu.service"
 import LogoHeader from "../components/LogoHeader"
+import AddItemModal from "./AddItemModal"
 import "../styles/InventoryPage.css"
 
 const InventoryPage = () => {
@@ -16,6 +17,7 @@ const InventoryPage = () => {
     null
   )
   const [menuItems, setMenuItems] = useState<MenuItem[]>([])
+  const [modalOpen, setModalOpen] = useState(false)
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -29,6 +31,11 @@ const InventoryPage = () => {
 
     fetchCategories()
   }, [])
+
+  const handleSaveNewItem = () => {
+    // Send to backend API
+    setModalOpen(true)
+  }
 
   const handleSuperCategoryClick = (superCategory: string) => {
     if (selectedSuperCategory === superCategory) {
@@ -72,7 +79,7 @@ const InventoryPage = () => {
 
       {/* ➕ Plus Button Below Line */}
       <div className="add-button-wrapper">
-        <button className="add-button" title="Add new item/category">
+        <button className="add-button" title="Add new item/category" onClick={handleSaveNewItem}>
           ＋
         </button>
       </div>
@@ -123,7 +130,20 @@ const InventoryPage = () => {
           ))}
         </div>
       </div>
+      {modalOpen && (
+  <AddItemModal
+    onClose={() => setModalOpen(false)}
+    onSave={handleSaveNewItem}
+    superCategories={menuCategories.map(cat => cat.superCategory)}
+    subCategories={
+      selectedSuperCategory
+        ? menuCategories.find(c => c.superCategory === selectedSuperCategory)?.subCategories || []
+        : []
+    }
+  />
+)}
     </div>
+    
   )
 }
 

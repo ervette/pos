@@ -143,36 +143,39 @@ export const getMenuItemsByCategory = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { subCategory } = req.query
+    const { subCategory } = req.query;
 
     if (!subCategory || typeof subCategory !== "string") {
-      res
-        .status(400)
-        .json({ error: "Invalid or missing subCategory parameter." })
-      return
+      res.status(400).json({ error: "Invalid or missing subCategory parameter." });
+      return;
     }
 
-    // ✅ Find the menu category that contains the requested subCategory
-    const menuCategory = await Menu.findOne({ subCategory })
+    // 🔄 Fetch ALL documents with the matching subCategory
+    const menuCategories = await Menu.find({ subCategory });
 
-    if (!menuCategory) {
-      res.status(404).json({ error: "No items found for this subcategory." })
-      return
+    if (!menuCategories.length) {
+      res.status(404).json({ error: "No items found for this subcategory." });
+      return;
     }
 
+    // 🔄 Merge all items from matching documents into one array
+    const allItems = menuCategories.flatMap((menu) => menu.items);
+
+    // ✅ Use superCategory from the first document for consistency
     res.json({
-      superCategory: menuCategory.superCategory,
-      subCategory: menuCategory.subCategory,
-      items: menuCategory.items,
-    })
+      superCategory: menuCategories[0].superCategory,
+      subCategory,
+      items: allItems,
+    });
   } catch (error) {
     if (error instanceof Error) {
-      res.status(500).json({ error: error.message })
+      res.status(500).json({ error: error.message });
     } else {
-      res.status(500).json({ error: "An unknown error occurred" })
+      res.status(500).json({ error: "An unknown error occurred" });
     }
   }
-}
+};
+
 
 // ✅ Get all distinct superCategories and their subCategories
 export const getMenuCategories = async (req: Request, res: Response): Promise<void> => {

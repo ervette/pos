@@ -23,6 +23,24 @@ export interface MenuCategory {
   subCategories: string[]
 }
 
+export interface IVariationInput {
+  type: string;
+  price: number;
+}
+
+export interface IModifierInput {
+  type: string;
+  price: number;
+}
+
+export interface IMenuItemPayload {
+  superCategory: string;
+  subCategory: string;
+  itemName: string;
+  variations: IVariationInput[];
+  modifiers: IModifierInput[];
+}
+
 export const getMenuCategories = async (): Promise<MenuCategory[]> => {
   if (navigator.onLine) {
     try {
@@ -196,3 +214,32 @@ export const getAllMenuItemsSafe = async (): Promise<MenuItem[]> => {
 
   return allItems
 }
+
+export const createMenuItem = async (payload: IMenuItemPayload): Promise<void> => {
+  const requestBody = {
+    superCategory: payload.superCategory,
+    subCategory: payload.subCategory,
+    items: [
+      {
+        name: payload.itemName,
+        variations: payload.variations.map((v) => ({
+          ...v,
+          quantity: 0, // Set default quantity
+        })),
+        modifiers: payload.modifiers,
+        isAvailable: true,
+      },
+    ],
+  };
+
+  const response = await fetch("http://localhost:5050/api/menu", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(requestBody),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to create menu item.");
+  }
+};
