@@ -90,10 +90,17 @@ export const getSalesReport = async (): Promise<SalesReport> => {
  * Get sales grouped by hour for workload visualization.
  */
 export const getHourlyWorkload = async (): Promise<WorkloadData[]> => {
+  const startOfDay = new Date()
+  startOfDay.setHours(0, 0, 0, 0)
+
+  const endOfDay = new Date()
+  endOfDay.setHours(23, 59, 59, 999)
+
   return await Order.aggregate([
     {
       $match: {
-        orderStatus: { $in: PAID_STATUSES }, // ✅ Only include paid orders
+        orderStatus: { $in: PAID_STATUSES },
+        createdAt: { $gte: startOfDay, $lte: endOfDay }, // ✅ Filter for today
       },
     },
     {
@@ -117,10 +124,17 @@ export const getHourlyWorkload = async (): Promise<WorkloadData[]> => {
  * Get most popular items by order count.
  */
 export const getPopularItems = async (): Promise<PopularItem[]> => {
+  const startOfDay = new Date()
+  startOfDay.setHours(0, 0, 0, 0)
+
+  const endOfDay = new Date()
+  endOfDay.setHours(23, 59, 59, 999)
+
   return await Order.aggregate([
     {
       $match: {
-        orderStatus: { $in: PAID_STATUSES }, // ✅ Only include paid orders
+        orderStatus: { $in: PAID_STATUSES },
+        createdAt: { $gte: startOfDay, $lte: endOfDay }, // ✅ Filter for today
       },
     },
     { $unwind: "$items" },

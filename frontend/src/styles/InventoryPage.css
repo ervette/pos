@@ -1,155 +1,158 @@
 /* ===== Inventory Page Styling ===== */
 .inventory-container {
-    background-color: #1e1e1e;
-    color: #ffffff;
-    min-height: 100vh;
-    font-family: 'Roboto', sans-serif;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  /* ===== Header Area ===== */
+  background-color: #1e1e1e;
+  color: #ffffff;
+  min-height: 100vh;
+  font-family: "Roboto", sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== Header Area ===== */
+.inventory-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 25px;
+  border-bottom: 1px solid #333;
+}
+
+.header-left,
+.header-center,
+.header-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.header-left {
+  justify-content: flex-start;
+}
+
+.header-center {
+  justify-content: center;
+}
+
+.header-right {
+  justify-content: flex-end;
+}
+
+.inventory-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+}
+
+/* ===== Plus Button Below Line ===== */
+.add-button-wrapper {
+  margin-top: 15px;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 25px;
+}
+
+.add-button {
+  background-color: #00bfff;
+  border: none;
+  color: white;
+  border-radius: 50%;
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s;
+}
+
+.add-button:hover {
+  background-color: #00a2cc;
+}
+
+/* ===== Menu Items Layout ===== */
+.inventory-content {
+  display: flex;
+  padding: 25px;
+}
+
+.supercategories-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+/* Subcategories */
+.subcategory-list {
+  margin-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Items */
+.item-list {
+  display: flex;
+  flex-direction: row; /* ➡️ Horizontal */
+  flex-wrap: wrap; /* ➡️ Wrap if too many */
+  gap: 10px; /* Space between items */
+  margin-left: 40px; /* Indent from subcategory */
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+/* Button Styling */
+.supercategory-button,
+.subcategory-button,
+.item-button {
+  border: none;
+  padding: 10px 16px;
+  color: white;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s;
+  width: 200px;
+  margin-top: 5px;
+  justify-content: center;
+}
+
+.supercategory-button {
+  background-color: #1194ff;
+}
+
+.subcategory-button {
+  background-color: #1194ff;
+}
+
+.item-button {
+  background-color: #39c7ff;
+}
+
+.supercategory-button:hover,
+.subcategory-button:hover,
+.item-button:hover {
+  background-color: #007bff;
+}
+
+/* No Items */
+.no-items {
+  margin-left: 10px;
+  color: #ccc;
+  font-style: italic;
+  font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
   .inventory-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 25px;
-    border-bottom: 1px solid #333;
-  }
-  
-  .header-left,
-  .header-center,
-  .header-right {
-    flex: 1;
-    display: flex;
-    align-items: center;
-  }
-  
-  .header-left {
-    justify-content: flex-start;
-  }
-  
-  .header-center {
-    justify-content: center;
-  }
-  
-  .header-right {
-    justify-content: flex-end;
-  }
-  
-  .inventory-title {
-    font-size: 24px;
-    font-weight: bold;
-    margin: 0;
-  }
-  
-  /* ===== Plus Button Below Line ===== */
-  .add-button-wrapper {
-    margin-top: 15px;
-    display: flex;
-    justify-content: flex-end;
-    padding: 0 25px;
-  }
-  
-  .add-button {
-    background-color: #00bfff;
-    border: none;
-    color: white;
-    border-radius: 50%;
-    font-size: 24px;
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.3s;
-  }
-  
-  .add-button:hover {
-    background-color: #00a2cc;
-  }
-  
-  /* ===== Menu Items Layout ===== */
-  .inventory-content {
-    display: flex;
-    padding: 25px;
-  }
-  
-  .supercategories-column {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 10px;
-  }
-  
-  /* Subcategories */
-  .subcategory-list {
-    margin-left: 20px;
-    display: flex;
     flex-direction: column;
     gap: 10px;
   }
-  
-  /* Items */
-  .item-list {
-    margin-left: 40px;
-    display: flex;
+
+  .inventory-content {
     flex-direction: column;
-    gap: 8px;
   }
-  
-  /* Button Styling */
-  .supercategory-button,
-  .subcategory-button,
-  .item-button {
-    border: none;
-    padding: 10px 16px;
-    color: white;
-    font-size: 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    text-align: left;
-    transition: background-color 0.3s;
-    width: 200px;
-    margin-top: 5px;
-  }
-
-  .supercategory-button{
-    background-color: #1194FF;
-  }
-
-  .subcategory-button{
-    background-color: #1194FF;
-  }
-
-  .item-button{
-    background-color: #39C7FF;
-  }
-  
-  .supercategory-button:hover,
-  .subcategory-button:hover,
-  .item-button:hover {
-    background-color: #007bff;
-  }
-  
-  /* No Items */
-  .no-items {
-    margin-left: 10px;
-    color: #ccc;
-    font-style: italic;
-    font-size: 14px;
-  }
-  
-  /* Responsive */
-  @media (max-width: 768px) {
-    .inventory-header {
-      flex-direction: column;
-      gap: 10px;
-    }
-  
-    .inventory-content {
-      flex-direction: column;
-    }
-  }
-  
+}
