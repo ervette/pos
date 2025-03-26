@@ -262,9 +262,9 @@ export const updateSuperCategoryName = async (
   newName: string
 ): Promise<void> => {
   const response = await fetch(`http://localhost:5050/api/menu/supercategory`, {
-    method: "PATCH",
+    method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ oldName, newName }),
+    body: JSON.stringify({ oldSuperCategory: oldName, newSuperCategory: newName }),
   })
 
   if (!response.ok) {
@@ -279,9 +279,9 @@ export const updateSubCategoryName = async (
   newName: string
 ): Promise<void> => {
   const response = await fetch(`http://localhost:5050/api/menu/subcategory`, {
-    method: "PATCH",
+    method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ superCategory, oldName, newName }),
+    body: JSON.stringify({ superCategory: superCategory, oldSubCategory: oldName, newSubCategory: newName }),
   })
 
   if (!response.ok) {

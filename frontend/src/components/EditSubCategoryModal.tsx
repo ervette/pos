@@ -27,7 +27,12 @@ const EditSubCategoryModal = ({
     }
 
     try {
-      await updateSubCategoryName(oldSubCategory, currentSuperCategory, newName.trim())
+      await updateSubCategoryName(
+        currentSuperCategory,
+        oldSubCategory,
+        newName.trim()
+      )
+
       onSave()
       onClose()
     } catch (error) {
