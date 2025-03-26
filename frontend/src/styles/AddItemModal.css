@@ -1,46 +1,63 @@
+/* ===== Add Item Modal Styling ===== */
+
 .modal-overlay {
     position: fixed;
-    top: 0; left: 0;
+    top: 0;
+    left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(0,0,0,0.6);
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 9999;
     display: flex;
-    justify-content: center;
     align-items: center;
-    z-index: 999;
+    justify-content: center;
   }
   
   .modal-content {
-    background-color: #2a2a2a;
-    padding: 25px;
-    border-radius: 10px;
-    width: 700px;
+    background-color: #1e1e1e;
+    padding: 30px;
+    border-radius: 12px;
+    width: 720px;
+    max-height: 90vh;
+    overflow-y: auto;
     position: relative;
-    color: white;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+    color: #ffffff;
     display: flex;
     flex-direction: column;
+    gap: 20px;
   }
   
   .close-btn {
     position: absolute;
-    top: 15px;
-    right: 20px;
+    top: 20px;
+    right: auto;
     background: none;
     border: none;
-    color: white;
-    font-size: 20px;
+    color: #fff;
+    font-size: 24px;
     cursor: pointer;
+    transition: color 0.2s ease;
+  }
+  
+  .close-btn:hover {
+    color: #ff4d4d;
   }
   
   .modal-title {
+    font-size: 24px;
+    font-weight: 600;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
   }
+  
+  /* ===== Inputs Section ===== */
   
   .category-inputs {
     display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 16px;
+    justify-content: space-between;
+    margin-top: 10px;
   }
   
   .input-group {
@@ -49,61 +66,112 @@
     flex: 1;
   }
   
+  .input-group label {
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: #ddd;
+  }
+  
   .input-group input {
-    padding: 8px;
-    border-radius: 5px;
+    padding: 10px;
+    border-radius: 6px;
+    background-color: #333;
     border: none;
-    margin-top: 5px;
+    color: #fff;
+    font-size: 14px;
   }
   
+  .input-group input:focus {
+    outline: 2px solid #00bfff;
+  }
+  
+  /* ===== Divider Line ===== */
   .vertical-separator {
-    margin: 15px 0;
-    border-top: 1px solid #555;
+    height: 1px;
+    background-color: #444;
+    border: none;
+    margin: 20px 0;
   }
   
+  /* ===== Variations & Modifiers Header ===== */
   .section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 15px;
-    margin-bottom: 10px;
   }
   
+  .section-header h3 {
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0;
+  }
+  
+  .section-header button {
+    background-color: #00bfff;
+    color: white;
+    font-size: 16px;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .section-header button:hover {
+    background-color: #00a2cc;
+  }
+  
+  /* ===== Dynamic Input Rows ===== */
   .dynamic-row {
     display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
+    gap: 12px;
+    margin-top: 10px;
   }
   
   .dynamic-row input {
-    padding: 8px;
     flex: 1;
-    border-radius: 5px;
+    padding: 10px;
+    border-radius: 6px;
+    background-color: #333;
     border: none;
+    color: #fff;
+    font-size: 14px;
+  }
+  
+  .dynamic-row input:focus {
+    outline: 2px solid #00bfff;
   }
   
   .dynamic-row button {
     background-color: #ff4d4d;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 5px;
     color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 5px;
     cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
   }
   
+  .dynamic-row button:hover {
+    background-color: #e63939;
+  }
+  
+  /* ===== Save Button ===== */
   .save-btn {
     margin-top: 20px;
     align-self: flex-end;
     background-color: #00bfff;
     color: white;
-    padding: 10px 20px;
+    padding: 12px 24px;
     border-radius: 6px;
     border: none;
+    font-size: 16px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s ease;
   }
   
   .save-btn:hover {
-    background-color: #00a2cc;
+    background-color: #009acd;
   }
   
