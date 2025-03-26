@@ -65,7 +65,7 @@ const EditSubCategoryModal = ({
           <label>Subcategory Name</label>
           <input
             type="text"
-            value={newName}
+            value={newName || ""}
             onChange={(e) => setNewName(e.target.value)}
           />
         </div>

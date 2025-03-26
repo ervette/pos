@@ -325,9 +325,13 @@ export const deleteSubCategory = async (
 
 export const updateMenuItem = async (
   itemId: string,
-  updatedData: IMenuItemUpdatePayload
+  updatedData: {
+    name: string
+    variations: { type: string; price: number }[]
+    modifiers: string[]
+  }
 ): Promise<void> => {
-  const response = await fetch(`http://localhost:5050/api/menu/${itemId}`, {
+  const response = await fetch(`http://localhost:5050/api/menu/item/${itemId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -341,8 +345,9 @@ export const updateMenuItem = async (
   }
 }
 
+
 export const deleteMenuItem = async (itemId: string): Promise<void> => {
-  const response = await fetch(`http://localhost:5050/api/menu/${itemId}`, {
+  const response = await fetch(`http://localhost:5050/api/menu/item/${itemId}`, {
     method: "DELETE",
   })
 

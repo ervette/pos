@@ -54,7 +54,7 @@ const EditSuperCategoryModal = ({
           <label>Supercategory Name</label>
           <input
             type="text"
-            value={newName}
+            value={newName || ""}
             onChange={(e) => setNewName(e.target.value)}
           />
         </div>

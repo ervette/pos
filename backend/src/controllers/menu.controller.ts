@@ -84,26 +84,62 @@ export const updateMenuItem = async (
   }
 }
 
-// Delete a menu item
-export const deleteMenuItem = async (
+// ✅ Update a nested menu item inside a menu document
+export const updateMenuItemByItemId = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const deletedMenuItem = await Menu.findByIdAndDelete(req.params.id)
-    if (!deletedMenuItem) {
-      res.status(404).json({ error: "Menu item not found" })
-      return // End function execution after sending the response
+    const { itemId } = req.params
+    const updatedData = req.body
+
+    const menuDoc = await Menu.findOneAndUpdate(
+      { "items._id": itemId },
+      {
+        $set: {
+          "items.$.name": updatedData.name,
+          "items.$.variations": updatedData.variations,
+          "items.$.modifiers": updatedData.modifiers,
+        },
+      },
+      { new: true }
+    )
+
+    if (!menuDoc) {
+      res.status(404).json({ error: "Item not found." })
+      return
     }
-    res.json({ message: "Menu item deleted successfully" })
+
+    res.json({ message: "Item updated successfully", itemId })
   } catch (error) {
-    if (error instanceof Error) {
-      res.status(500).json({ error: error.message })
-    } else {
-      res.status(500).json({ error: "An unknown error occurred" })
-    }
+    console.error("Update error:", error)
+    res.status(500).json({ error: "Failed to update menu item." })
   }
 }
+
+
+// Delete a menu item
+export const deleteMenuItem = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { itemId } = req.params;
+
+    const updatedDoc = await Menu.findOneAndUpdate(
+      { "items._id": itemId },
+      { $pull: { items: { _id: itemId } } },
+      { new: true }
+    );
+
+    if (!updatedDoc) {
+      res.status(404).json({ error: "Item not found." });
+      return;
+    }
+
+    res.json({ message: "Item deleted successfully", itemId });
+  } catch (error) {
+    res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+  }
+};
+
 
 // Adjust inventory for a specific variation
 export const adjustInventory = async (
@@ -257,7 +293,7 @@ export const updateSubCategory = async (req: Request, res: Response): Promise<vo
 };
 
 export const deleteSuperCategory = async (req: Request, res: Response): Promise<void> => {
-  const { superCategory } = req.body;
+  const { superCategory } = req.params;
 
   if (!superCategory) {
     res.status(400).json({ error: "superCategory is required." });
@@ -273,7 +309,7 @@ export const deleteSuperCategory = async (req: Request, res: Response): Promise<
 };
 
 export const deleteSubCategory = async (req: Request, res: Response): Promise<void> => {
-  const { superCategory, subCategory } = req.body;
+  const { superCategory, subCategory } = req.params;
 
   if (!superCategory || !subCategory) {
     res.status(400).json({ error: "superCategory and subCategory are required." });

@@ -117,7 +117,7 @@ const EditItemModal = ({
             <label>Supercategory</label>
             <input
               list="superCategoryList"
-              value={superCategory}
+              value={superCategory || ""}
               onChange={(e) => setSuperCategory(e.target.value)}
               placeholder="Change or create..."
             />
@@ -132,7 +132,7 @@ const EditItemModal = ({
             <label>Subcategory</label>
             <input
               list="subCategoryList"
-              value={subCategory}
+              value={subCategory || ""}
               onChange={(e) => setSubCategory(e.target.value)}
               placeholder="Change or create..."
             />
@@ -147,7 +147,7 @@ const EditItemModal = ({
             <label>Item Name</label>
             <input
               type="text"
-              value={name}
+              value={name || ""}
               onChange={(e) => setName(e.target.value)}
               placeholder="Item Name"
             />
@@ -166,7 +166,7 @@ const EditItemModal = ({
             <input
               type="text"
               placeholder="Type"
-              value={variation.type}
+              value={variation.type || ""}
               onChange={(e) =>
                 handleVariationChange(index, "type", e.target.value)
               }
@@ -174,7 +174,7 @@ const EditItemModal = ({
             <input
               type="number"
               placeholder="£ Price"
-              value={variation.price}
+              value={variation.price || ""}
               onChange={(e) =>
                 handleVariationChange(index, "price", e.target.value)
               }
@@ -195,7 +195,7 @@ const EditItemModal = ({
             <input
               type="text"
               placeholder="Modifier"
-              value={modifier}
+              value={modifier || ""}
               onChange={(e) => handleModifierChange(index, e.target.value)}
             />
             {index > 0 && (
