@@ -8,6 +8,10 @@ import {
   adjustInventory,
   getMenuItemsByCategory,
   getMenuCategories,
+  updateSubCategory,
+  updateSuperCategory,
+  deleteSuperCategory,
+  deleteSubCategory
 } from "../controllers/menu.controller";
 
 const router = express.Router();
@@ -15,6 +19,10 @@ const router = express.Router();
 // CRUD endpoints for menu items
 router.get("/items", getMenuItemsByCategory); // ✅ Fix the route
 router.get("/categories", getMenuCategories);
+router.put("/super-category", updateSuperCategory); // Rename superCategory
+router.put("/sub-category", updateSubCategory);     // Rename subCategory
+router.delete("/super-category", deleteSuperCategory); // Delete superCategory
+router.delete("/sub-category", deleteSubCategory);     // Delete subCategory
 
 router.post("/", createMenuItem); // Create
 router.get("/", getAllMenuItems); // Read (all)

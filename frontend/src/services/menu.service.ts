@@ -24,21 +24,32 @@ export interface MenuCategory {
 }
 
 export interface IVariationInput {
-  type: string;
-  price: number;
+  type: string
+  price: number
 }
 
 export interface IModifierInput {
-  type: string;
-  price: number;
+  type: string
+  price: number
 }
 
 export interface IMenuItemPayload {
-  superCategory: string;
-  subCategory: string;
-  itemName: string;
-  variations: IVariationInput[];
-  modifiers: string[];
+  superCategory: string
+  subCategory: string
+  itemName: string
+  variations: IVariationInput[]
+  modifiers: string[]
+}
+
+export interface IMenuItemUpdatePayload {
+  name: string
+  superCategory: string
+  subCategory: string
+  variations: {
+    type: string
+    price: number
+  }[]
+  modifiers: string[]
 }
 
 export const getMenuCategories = async (): Promise<MenuCategory[]> => {
@@ -215,7 +226,9 @@ export const getAllMenuItemsSafe = async (): Promise<MenuItem[]> => {
   return allItems
 }
 
-export const createMenuItem = async (payload: IMenuItemPayload): Promise<void> => {
+export const createMenuItem = async (
+  payload: IMenuItemPayload
+): Promise<void> => {
   const requestBody = {
     superCategory: payload.superCategory,
     subCategory: payload.subCategory,
@@ -230,16 +243,111 @@ export const createMenuItem = async (payload: IMenuItemPayload): Promise<void> =
         isAvailable: true,
       },
     ],
-  };
+  }
 
   const response = await fetch("http://localhost:5050/api/menu", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(requestBody),
-  });
+  })
 
   if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || "Failed to create menu item.");
+    const errorData = await response.json()
+    throw new Error(errorData.error || "Failed to create menu item.")
   }
-};
+}
+
+export const updateSuperCategoryName = async (
+  oldName: string,
+  newName: string
+): Promise<void> => {
+  const response = await fetch(`http://localhost:5050/api/menu/supercategory`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ oldName, newName }),
+  })
+
+  if (!response.ok) {
+    const errorData = await response.json()
+    throw new Error(errorData.error || "Failed to update supercategory.")
+  }
+}
+
+export const updateSubCategoryName = async (
+  superCategory: string,
+  oldName: string,
+  newName: string
+): Promise<void> => {
+  const response = await fetch(`http://localhost:5050/api/menu/subcategory`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ superCategory, oldName, newName }),
+  })
+
+  if (!response.ok) {
+    const errorData = await response.json()
+    throw new Error(errorData.error || "Failed to update subcategory.")
+  }
+}
+
+export const deleteSuperCategory = async (
+  superCategory: string
+): Promise<void> => {
+  const response = await fetch(
+    `http://localhost:5050/api/menu/supercategory/${superCategory}`,
+    {
+      method: "DELETE",
+    }
+  )
+
+  if (!response.ok) {
+    const errorData = await response.json()
+    throw new Error(errorData.error || "Failed to delete supercategory.")
+  }
+}
+
+export const deleteSubCategory = async (
+  superCategory: string,
+  subCategory: string
+): Promise<void> => {
+  const response = await fetch(
+    `http://localhost:5050/api/menu/subcategory/${superCategory}/${subCategory}`,
+    {
+      method: "DELETE",
+    }
+  )
+
+  if (!response.ok) {
+    const errorData = await response.json()
+    throw new Error(errorData.error || "Failed to delete subcategory.")
+  }
+}
+
+export const updateMenuItem = async (
+  itemId: string,
+  updatedData: IMenuItemUpdatePayload
+): Promise<void> => {
+  const response = await fetch(`http://localhost:5050/api/menu/${itemId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(updatedData),
+  })
+
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error?.message || "Failed to update menu item.")
+  }
+}
+
+export const deleteMenuItem = async (itemId: string): Promise<void> => {
+  const response = await fetch(`http://localhost:5050/api/menu/${itemId}`, {
+    method: "DELETE",
+  })
+
+  if (!response.ok) {
+    const errorData = await response.json()
+    throw new Error(errorData.error || "Failed to delete menu item.")
+  }
+}
