@@ -1,0 +1,594 @@
+/* ✅ Global Container */
+.table-order-container {
+  width: 100%;
+  height: 100vh;
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+  background-color: #1e1e1e;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  font-family: Arial, sans-serif;
+  overflow: hidden; /* Prevents full-page scrolling */
+}
+
+/* ✅ Logo + Header */
+.table-order-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 55px;
+  position: relative;
+  margin-top: 0vh;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  margin-top: 4vh;
+}
+
+.logo-container img {
+  max-height: 40px; /* Fixed logo height */
+  margin-left: 10px; /* Adjust to prevent it from being too high */
+}
+
+.table-order-title {
+  font-size: 22px;
+  font-weight: 400;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* ✅ Main Layout */
+.table-order-layout {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+  height: calc(100vh - 100px);
+  overflow: hidden;
+}
+
+/* ✅ Left Panel: Bill Section */
+.bill-section {
+  flex: 1;
+  background-color: #2b2b2b;
+  padding: 15px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.bill-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.print-btn,
+.pay-btn {
+  padding: 8px 12px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-weight: bold;
+}
+
+.print-btn {
+  background-color: #1194ff;
+}
+
+.pay-btn {
+  background-color: #2cb82c;
+}
+
+/* ✅ Fix Bill Table Layout */
+.bill-table {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.bill-row {
+  display: grid;
+  grid-template-columns: 3fr 1fr 1fr 30px; /* Proper column layout */
+  padding: 8px 0;
+  align-items: center;
+  border-bottom: 1px solid #444;
+}
+
+.bill-row.header {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.remove-btn {
+  background: none;
+  border: none;
+  color: red;
+  font-size: 16px;
+  cursor: pointer;
+  justify-self: end;
+}
+
+/* ✅ Fix Notes Placement */
+.bill-row .item-notes {
+  grid-column: 1 / -1;
+  font-size: 16px;
+  color: #bbb;
+  margin-top: 3px;
+}
+
+/* ✅ Color for Selected Items */
+.colored-item {
+  background-color: #3a3a3a;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 5px;
+}
+
+/* ✅ Bill Footer */
+.bill-footer {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #444;
+}
+
+/* ✅ Bill Actions - Bigger Buttons */
+.bill-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.cancel-btn,
+.gratuity-btn,
+.send-btn {
+  flex: 1;
+  padding: 12px;
+  margin: 5px;
+  border-radius: 5px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background-color: red;
+  color: white;
+}
+
+.gratuity-btn {
+  background-color: orange;
+  color: black;
+}
+
+.send-btn {
+  background-color: #ff9800;
+  color: white;
+}
+
+/* ✅ Middle Panel: Items Section */
+.items-section {
+  flex: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  overflow-y: auto;
+  max-height: 100%;
+}
+
+/* ✅ Fix Item Buttons */
+.item-button {
+  background-color: #4ab3ff;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  width: 140px;
+  height: 60px;
+  text-align: center;
+  color: white;
+  font-weight: bold;
+}
+
+.item-button:hover {
+  background-color: #0074cc;
+}
+
+/* ✅ Right Panel: Category & Subcategory */
+.menu-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  overflow-y: auto;
+  max-height: 100%;
+}
+
+.category-block {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+.category-button {
+  background-color: #0074cc;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-weight: bold;
+  text-align: left;
+}
+
+.subcategory-list {
+  margin-left: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.subcategory-button {
+  background-color: #4ab3ff;
+  padding: 8px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  color: white;
+  text-align: left;
+}
+
+/* ✅ Modal Styling */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #1a1a1a;
+  padding: 20px;
+  border-radius: 8px;
+  width: 450px; /* ✅ More horizontal layout */
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  position: relative;
+  color: white;
+}
+
+/* 🎯 Modal Title */
+.modal-content h2 {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* 🎯 Modal Headings (e.g., Select Variation, Modifiers, Notes) */
+.modal-content h4 {
+  margin-top: 15px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.modifier-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+/* 🎯 Notes Input */
+.notes-input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  background: #2a2a2a;
+  border: 1px solid #555;
+  border-radius: 5px;
+  color: white;
+  font-size: 14px;
+  resize: vertical;
+}
+
+/* ✅ Close Button Position */
+.close-btn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* ✅ Inline "Select Variation" */
+.modal-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-start;
+  margin-bottom: 10px;
+}
+
+.modal-content label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* ✅ Fix Special Instructions Input Width */
+.modal-content textarea {
+  width: 100%;
+  max-width: 100%;
+  min-width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background: #2a2a2a;
+  border: 1px solid #555;
+  color: white;
+}
+
+/* ✅ Fix Add Button */
+.add-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 20px;
+  background: #28a745;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+.add-btn:hover {
+  background: darkgreen;
+}
+
+/* Gratuity Modal Specific */
+.gratuity-modal {
+  width: 400px; /* Consistent size with your design */
+  max-width: 90vw;
+}
+
+/* Modal Title */
+.modal-title {
+  margin-bottom: 15px;
+  font-size: 22px;
+  font-weight: bold;
+  color: white;
+}
+
+/* Radio Button Container */
+.gratuity-options {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+/* Radio Button Styling */
+.gratuity-radio {
+  font-size: 16px;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Input Field Styling */
+.gratuity-input {
+  width: 100%;
+  padding: 10px;
+  background: #2a2a2a;
+  border: 1px solid #555;
+  color: white;
+  font-size: 16px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+/* Payment Modal Styling */
+.payment-modal {
+  background-color: #1a1a1a;
+  padding: 20px;
+  border-radius: 8px;
+  width: 450px;
+  max-width: 90vw;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  position: relative;
+  color: white;
+}
+
+.payment-modal h2 {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+/* Close Button */
+.payment-modal .close-btn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* Split Options */
+.split-options {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.split-button {
+  flex: 1;
+  margin: 0 5px;
+  padding: 10px;
+  background-color: #2b2b2b;
+  border: 1px solid #555;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  text-align: center;
+  font-weight: bold;
+}
+
+.split-button:hover {
+  background-color: #3a3a3a;
+}
+
+/* Payment Methods */
+.payment-methods {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+
+.payment-radio {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Pay Button */
+.pay-confirm-btn {
+  width: 100%;
+  padding: 12px;
+  background: green;
+  color: white;
+  font-size: 18px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.pay-confirm-btn:hover {
+  background: darkgreen;
+}
+
+/* ✅ Mobile Support */
+@media screen and (max-width: 768px) {
+  /* ✅ Adjust Layout for Small Screens */
+  .table-order-layout {
+    flex-direction: column;
+    height: auto;
+    gap: 10px;
+  }
+
+  /* ✅ Make Bill Section Take Full Width */
+  .bill-section {
+    width: 100%;
+    height: auto;
+  }
+
+  /* ✅ Ensure Items Section is Scrollable */
+  .items-section {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    display: flex;
+    flex-direction: row;
+    padding-bottom: 10px;
+    max-height: 180px; /* Prevents excessive height */
+  }
+
+  /* ✅ Make Buttons Bigger for Touch Screens */
+  .item-button,
+  .category-button,
+  .subcategory-button {
+    width: 120px;
+    height: 50px;
+    font-size: 14px;
+  }
+
+  /* ✅ Fix Category Layout on Mobile */
+  .menu-section {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 10px;
+  }
+
+  .category-block {
+    display: inline-block;
+    margin-right: 10px;
+  }
+
+  /* ✅ Fix Modal for Smaller Screens */
+  .modal-content {
+    width: 90%;
+    max-width: 350px;
+    padding: 15px;
+  }
+
+  /* ✅ Ensure Variation Options Stay Inline */
+  .modal-options {
+    flex-wrap: wrap;
+  }
+
+  /* ✅ Fix Close Button on Mobile */
+  .modal-content .close-btn {
+    top: 8px;
+    left: 8px;
+    font-size: 18px;
+  }
+
+  /* ✅ Fix Text Area for Notes */
+  .modal-content textarea {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  /* ✅ Fix Add Button */
+  .add-btn {
+    font-size: 16px;
+    padding: 10px;
+  }
+
+  .payment-modal {
+    width: 90%;
+    max-width: 350px;
+    padding: 15px;
+  }
+  .split-options {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .split-button {
+    margin: 0;
+    padding: 8px;
+  }
+  .payment-methods {
+    flex-direction: column;
+    gap: 10px;
+  }
+}

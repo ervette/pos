@@ -51,18 +51,8 @@ const Navbar = () => {
             </Link>
           </li>
           <li>
-            <Link to="/settings" onClick={toggleSidebar}>
-              Settings
-            </Link>
-          </li>
-          <li>
             <Link to="/inventory" onClick={toggleSidebar}>
               Inventory
-            </Link>
-          </li>
-          <li>
-            <Link to="/accounting" onClick={toggleSidebar}>
-              Accounting
             </Link>
           </li>
           <li>
@@ -73,10 +63,7 @@ const Navbar = () => {
         </ul>
 
         {/* Exit Button */}
-        <div
-          className="exit-button"
-          onClick={handleLogout}
-        >
+        <div className="exit-button" onClick={handleLogout}>
           Exit <FaSignOutAlt />
         </div>
       </nav>

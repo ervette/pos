@@ -28,3 +28,16 @@ export const logout = (): void => {
 export const getToken = (): string | null => {
   return localStorage.getItem("token");
 };
+
+export const getServerNameFromToken = (): string => {
+  const token = localStorage.getItem("token")
+  if (!token) return "Unknown Server"
+
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]))
+    return payload.username || "Server"
+  } catch (error) {
+    console.error("Invalid token format", error)
+    return "Server"
+  }
+}

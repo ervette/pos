@@ -1,67 +1,79 @@
 import { Request, Response } from "express"
-import Order from "../models/order.model"
+import Order, { IOrderItem } from "../models/order.model"
 import { Error } from "mongoose"
 
 // Create a new order
-
 export const createOrder = async (req: Request, res: Response) => {
   try {
     const { orderId, tableNumber, items, totalPrice, orderStatus } = req.body
 
-    // ✅ Check if an open order already exists for the table
     const existingOrder = await Order.findOne({
       tableNumber,
       orderStatus: "open",
     })
 
     if (existingOrder) {
-      console.warn(
-        `Existing open order found for table ${tableNumber}. Updating order instead.`
-      )
+      console.warn(`Updating existing order for table ${tableNumber}`)
 
-      // ✅ Update the existing open order
-      existingOrder.items = items
+      existingOrder.items = items.map((item: IOrderItem) => ({
+        ...item,
+        orderItemId: item.orderItemId ?? crypto.randomUUID(), // ✅ Ensure every item has a unique orderItemId
+      }))
       existingOrder.totalPrice = totalPrice
       existingOrder.updatedAt = new Date()
       await existingOrder.save()
 
-      return res.status(200).json({
-        message: "Order updated instead of creating a duplicate.",
-        order: existingOrder,
-      })
+      return res
+        .status(200)
+        .json({ message: "Order updated.", order: existingOrder })
     }
 
-    // ✅ Otherwise, create a new order
     const newOrder = new Order({
       orderId,
       tableNumber,
-      items,
+      items: items.map((item: IOrderItem) => ({
+        ...item,
+        orderItemId: item.orderItemId ?? crypto.randomUUID(), // ✅ Assign orderItemId if missing
+      })),
       totalPrice,
       orderStatus,
     })
-    await newOrder.save()
 
+    await newOrder.save()
     return res
       .status(201)
       .json({ message: "Order created successfully.", order: newOrder })
   } catch (error) {
     console.error("Error processing order:", error)
-    res.status(500).json({ error: Error })
+    res.status(500).json({ error: "Internal Server Error" })
   }
 }
 
 // Get all orders
 export const getOrders = async (req: Request, res: Response) => {
   try {
-    const { status } = req.query
+    const { tableNumber, status, limit } = req.query
 
-    // ✅ Only filter if status is provided
     const filter: Record<string, unknown> = {}
+
+    if (tableNumber) {
+      filter.tableNumber = Number(tableNumber)
+    }
+
     if (status) {
       filter.orderStatus = status
     }
 
-    const orders = await Order.find(filter)
+    let query = Order.find(filter).sort({ createdAt: -1 }) // ✅ Sort by newest
+
+    if (limit) {
+      const parsedLimit = parseInt(limit as string, 10)
+      if (!isNaN(parsedLimit) && parsedLimit > 0) {
+        query = query.limit(parsedLimit)
+      }
+    }
+
+    const orders = await query
     res.json(orders)
   } catch (error) {
     console.error("Error fetching orders:", error)
@@ -96,24 +108,30 @@ export const updateOrder = async (
   res: Response
 ): Promise<Response> => {
   try {
+    const { items } = req.body
+
+    // ✅ Ensure every item in the order has a unique `orderItemId`
+    if (Array.isArray(items)) {
+      items.forEach((item: IOrderItem) => {
+        if (!item.orderItemId) {
+          item.orderItemId = crypto.randomUUID()
+        }
+      })
+    }
     const updatedOrder = await Order.findByIdAndUpdate(
       req.params.id,
-      req.body,
-      {
-        new: true,
-      }
+      { ...req.body, items },
+      { new: true }
     )
+
     if (!updatedOrder) {
       return res.status(404).json({ error: "Order not found" })
     }
+
     return res.json(updatedOrder)
   } catch (error: unknown) {
     console.error("Error updating order:", error)
-
-    if (error instanceof Error) {
-      return res.status(400).json({ error: error.message })
-    }
-    return res.status(500).json({ error: "An unknown error occurred" })
+    return res.status(400).json({ error: (error as Error).message })
   }
 }
 
@@ -123,6 +141,7 @@ export const deleteOrder = async (
   res: Response
 ): Promise<Response> => {
   try {
+    console.log("Attempting to delete order with ID:", req.params.id)
     const deletedOrder = await Order.findByIdAndDelete(req.params.id)
     if (!deletedOrder) {
       return res.status(404).json({ error: "Order not found" })
@@ -135,5 +154,92 @@ export const deleteOrder = async (
       return res.status(500).json({ error: error.message })
     }
     return res.status(500).json({ error: "An unknown error occurred" })
+  }
+}
+
+// ✅ Remove an item from an order
+export const removeOrderItem = async (req: Request, res: Response) => {
+  try {
+    const { orderId, orderItemId } = req.params
+    console.log(
+      `🛠 Removing orderItemId: ${orderItemId} from orderId: ${orderId}`
+    )
+
+    // ✅ Ensure we query by `orderId` (UUID string), NOT `_id`
+    const order = await Order.findOne({ orderId: orderId })
+
+    if (!order) {
+      console.error(`❌ Order not found: ${orderId}`)
+      return res.status(404).json({ error: "Order not found" })
+    }
+
+    console.log(
+      `🔍 Current order items before removal:`,
+      order.items.map((i) => i.orderItemId)
+    )
+
+    // ✅ Find item by `orderItemId`
+    const itemIndex = order.items.findIndex(
+      (item) => item.orderItemId === orderItemId
+    )
+    if (itemIndex === -1) {
+      console.error(
+        `❌ orderItemId ${orderItemId} not found in order ${orderId}`
+      )
+      return res.status(404).json({ error: "Item not found in order" })
+    }
+
+    // ✅ Remove item
+    order.items.splice(itemIndex, 1)
+    order.totalPrice = order.items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    )
+
+    console.log(
+      `✅ Updated order items after removal:`,
+      order.items.map((i) => i.orderItemId)
+    )
+
+    // ✅ Save updated order
+    await order.save()
+    console.log(`✅ Order updated successfully.`)
+
+    return res.json({ message: "Item removed successfully", order })
+  } catch (error) {
+    console.error("❌ Error removing item:", error)
+    return res.status(500).json({
+      error: "Failed to remove item",
+      details: (error as Error).message,
+    })
+  }
+}
+
+export const updateOrderByOrderId = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const { orderId } = req.params
+    const { orderStatus } = req.body
+
+    if (!orderStatus) {
+      return res.status(400).json({ error: "Missing orderStatus" })
+    }
+
+    const updatedOrder = await Order.findOneAndUpdate(
+      { orderId },
+      { orderStatus, updatedAt: new Date() },
+      { new: true }
+    )
+
+    if (!updatedOrder) {
+      return res.status(404).json({ error: "Order not found" })
+    }
+
+    return res.json(updatedOrder)
+  } catch (error: unknown) {
+    console.error("Error updating order status by orderId:", error)
+    return res.status(500).json({ error: "Server error" })
   }
 }

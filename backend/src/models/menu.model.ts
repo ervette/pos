@@ -40,12 +40,7 @@ const MenuSchema = new Schema<IMenu>({
         },
       ],
       isAvailable: { type: Boolean, default: true },
-      modifiers: [
-        {
-          name: { type: String, required: true },
-          price: { type: Number, required: true },
-        },
-      ],
+      modifiers: [],
     },
   ],
   createdAt: { type: Date, default: Date.now },
