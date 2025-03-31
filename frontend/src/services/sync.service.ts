@@ -36,9 +36,25 @@ export const handleOrderSubmission = async (orderData: Order): Promise<void> => 
 
     // ✅ Queue for sync if no _id (offline or backend failed)
     if (!orderData._id) {
-      await addToSyncQueue("addOrder", orderData)
-      console.log("⏳ Order added to sync queue.")
+      const existing = await db.syncQueue
+        .where("data.orderId")
+        .equals(orderData.orderId)
+        .first()
+    
+      if (existing) {
+        // Replace existing queue entry
+        await db.syncQueue.put({
+          id: existing.id, // Keep same ID to overwrite
+          operation: "addOrder",
+          data: orderData,
+        })
+        console.log("🔁 Updated existing sync queue entry for order:", orderData.orderId)
+      } else {
+        await addToSyncQueue("addOrder", orderData)
+        console.log("⏳ New order added to sync queue.")
+      }
     }
+    
   } catch (error) {
     console.error("❌ Error processing order:", error)
 

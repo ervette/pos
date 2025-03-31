@@ -96,47 +96,48 @@ export const fetchAndCacheMenu = async (): Promise<void> => {
       createdAt: string
     }[] = await response.json()
 
-    console.log("Received menu data:", menuData) // ✅ Debug the response
+    console.log("Received menu data:", menuData)
 
-    // ✅ Check for correct structure
     if (!Array.isArray(menuData)) {
       throw new Error("Invalid menu structure received: Expected an array.")
     }
 
-    // ✅ Transform API response into expected format
-    const categories: MenuCategory[] = menuData.map((category) => ({
-      superCategory: category.superCategory,
-      subCategories: [category.subCategory], // Ensure subCategories is an array
-    }))
+    // ✅ Deduplicate categories using a Map
+    const categoryMap = new Map<string, Set<string>>()
 
-    const items: MenuItem[] = menuData.flatMap((category) =>
-      category.items.map(
-        (item: {
-          _id: string
-          name: string
-          variations: { type: string; price: number; quantity?: number }[]
-          isAvailable?: boolean
-          modifiers?: string[]
-        }) => ({
-          itemId: item._id,
-          name: item.name,
-          category: category.superCategory,
-          subcategory: category.subCategory,
-          variations: item.variations.map(
-            (v: { type: string; price: number; quantity?: number }) => ({
-              type: v.type,
-              price: v.price,
-              quantity: v.quantity ?? 1, // ✅ Ensure quantity exists
-            })
-          ),
-          price: item.variations.length > 0 ? item.variations[0].price : 0,
-          isAvailable: item.isAvailable ?? true,
-          modifiers: item.modifiers || [],
-        })
-      )
+    menuData.forEach((entry) => {
+      if (!categoryMap.has(entry.superCategory)) {
+        categoryMap.set(entry.superCategory, new Set())
+      }
+      categoryMap.get(entry.superCategory)?.add(entry.subCategory)
+    })
+
+    const categories: MenuCategory[] = Array.from(categoryMap.entries()).map(
+      ([superCategory, subCategorySet]) => ({
+        superCategory,
+        subCategories: Array.from(subCategorySet),
+      })
     )
 
-    // ✅ Save data to IndexedDB
+    // ✅ Transform items
+    const items: MenuItem[] = menuData.flatMap((category) =>
+      category.items.map((item) => ({
+        itemId: item._id,
+        name: item.name,
+        category: category.superCategory,
+        subcategory: category.subCategory,
+        variations: item.variations.map((v) => ({
+          type: v.type,
+          price: v.price,
+          quantity: v.quantity ?? 1,
+        })),
+        price: item.variations.length > 0 ? item.variations[0].price : 0,
+        isAvailable: item.isAvailable ?? true,
+        modifiers: item.modifiers || [],
+      }))
+    )
+
+    // ✅ Save to IndexedDB
     await db.transaction("rw", db.menuCategories, db.menuItems, async () => {
       await db.menuCategories.clear()
       await db.menuItems.clear()
@@ -144,9 +145,9 @@ export const fetchAndCacheMenu = async (): Promise<void> => {
       await db.menuItems.bulkAdd(items)
     })
 
-    console.log("Menu data successfully cached.")
+    console.log("✅ Menu data successfully cached (deduplicated).")
   } catch (error) {
-    console.error("Failed to fetch menu data:", error)
+    console.error("❌ Failed to fetch menu data:", error)
   }
 }
 
@@ -264,7 +265,10 @@ export const updateSuperCategoryName = async (
   const response = await fetch(`http://localhost:5050/api/menu/supercategory`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ oldSuperCategory: oldName, newSuperCategory: newName }),
+    body: JSON.stringify({
+      oldSuperCategory: oldName,
+      newSuperCategory: newName,
+    }),
   })
 
   if (!response.ok) {
@@ -281,7 +285,11 @@ export const updateSubCategoryName = async (
   const response = await fetch(`http://localhost:5050/api/menu/subcategory`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ superCategory: superCategory, oldSubCategory: oldName, newSubCategory: newName }),
+    body: JSON.stringify({
+      superCategory: superCategory,
+      oldSubCategory: oldName,
+      newSubCategory: newName,
+    }),
   })
 
   if (!response.ok) {
@@ -331,13 +339,16 @@ export const updateMenuItem = async (
     modifiers: string[]
   }
 ): Promise<void> => {
-  const response = await fetch(`http://localhost:5050/api/menu/item/${itemId}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(updatedData),
-  })
+  const response = await fetch(
+    `http://localhost:5050/api/menu/item/${itemId}`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedData),
+    }
+  )
 
   if (!response.ok) {
     const error = await response.json()
@@ -345,11 +356,13 @@ export const updateMenuItem = async (
   }
 }
 
-
 export const deleteMenuItem = async (itemId: string): Promise<void> => {
-  const response = await fetch(`http://localhost:5050/api/menu/item/${itemId}`, {
-    method: "DELETE",
-  })
+  const response = await fetch(
+    `http://localhost:5050/api/menu/item/${itemId}`,
+    {
+      method: "DELETE",
+    }
+  )
 
   if (!response.ok) {
     const errorData = await response.json()

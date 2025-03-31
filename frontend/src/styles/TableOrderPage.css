@@ -217,7 +217,7 @@
 .category-block {
   display: flex;
   flex-direction: column;
-  margin-bottom: 10px;
+  /* margin-bottom: 10px; */
 }
 
 .category-button {
@@ -235,7 +235,8 @@
   margin-left: 15px;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 5px !important;
+  margin-top: 5px;
 }
 
 .subcategory-button {

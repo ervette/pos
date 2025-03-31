@@ -100,6 +100,7 @@
   margin-left: 40px; /* Indent from subcategory */
   overflow-x: auto;
   white-space: nowrap;
+  margin-top: 5px;
 }
 
 /* Button Styling */
@@ -115,7 +116,6 @@
   text-align: center;
   transition: background-color 0.3s;
   width: 200px;
-  margin-top: 5px;
   justify-content: center;
 }
 
