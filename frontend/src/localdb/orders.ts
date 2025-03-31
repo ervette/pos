@@ -1,6 +1,6 @@
 import db from "./index"
 import { Order } from "./index" // Import Order interface
-import { addToSyncQueue } from "./syncQueue" // Import sync queue handling
+import { addToSyncQueue, getSyncQueue, deleteFromSyncQueue } from "./syncQueue" // Import sync queue handling
 
 // Add a new order locally and queue for sync
 export const addOrder = async (order: Partial<Order>): Promise<number> => {
@@ -85,4 +85,21 @@ export const deleteOrder = async (id: number): Promise<void> => {
     createdAt: existingOrder.createdAt,
     updatedAt: new Date(), // ✅ Ensure updatedAt is updated
   })
+}
+
+export const handleOfflineDelete = async (orderId: string) => {
+  const queueItems = await getSyncQueue()
+  const existingAdd = queueItems.find(
+    (item) => item.data.orderId === orderId && item.operation === "add"
+  )
+
+  if (existingAdd) {
+    // Remove the queued "add" if it hasn’t been synced yet
+    await deleteFromSyncQueue(existingAdd.id!)
+    await db.orders.delete(orderId)
+  } else {
+    // Otherwise queue a "delete"
+    await addToSyncQueue("delete", { orderId } as Order)
+    await db.orders.delete(orderId)
+  }
 }

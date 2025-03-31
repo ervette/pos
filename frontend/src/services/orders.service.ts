@@ -1,4 +1,5 @@
 import db from "../localdb/index"
+import { addToSyncQueue } from "../localdb/syncQueue"
 import { Order, OrderItem } from "../localdb/index"
 
 // ✅ Fetch Open Orders (Online First, Offline Fallback)
@@ -96,26 +97,77 @@ export const removeOrderItem = async (
 ): Promise<void> => {
   try {
     console.log(
-      `🛠 API CALL: Deleting orderItemId: ${orderItemId} from orderId: ${orderId}`
+      `🛠 Deleting orderItemId: ${orderItemId} from orderId: ${orderId}`
     )
 
-    const response = await fetch(
-      `http://localhost:5050/api/orders/${orderId}/items/${orderItemId}`, // ✅ Matches the backend route
-      {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+    if (navigator.onLine) {
+      // ✅ Online: normal backend delete
+      const response = await fetch(
+        `http://localhost:5050/api/orders/${orderId}/items/${orderItemId}`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error(`❌ Failed to remove item: ${response.statusText}`)
       }
-    )
 
-    if (!response.ok) {
-      throw new Error(`❌ Failed to remove item: ${response.statusText}`)
+      console.log(`✅ Order item ${orderItemId} removed from backend.`)
     }
 
-    console.log(`✅ Order item ${orderItemId} removed successfully.`)
+    // ✅ Either way (online or offline), update local order
+    const localOrder = await db.orders
+      .where("orderId")
+      .equals(orderId)
+      .first()
+
+    if (!localOrder) {
+      console.warn("⚠️ No local order found with ID:", orderId)
+      return
+    }
+
+    // ✅ Remove item from order
+    const updatedItems = localOrder.items.filter(
+      (item) => item.orderItemId !== orderItemId
+    )
+    const updatedOrder: Order = {
+      ...localOrder,
+      items: updatedItems,
+      updatedAt: new Date(),
+      totalPrice: updatedItems.reduce(
+        (acc, item) => acc + item.price * item.quantity,
+        0
+      ),
+    }
+
+    // ✅ Save updated order locally
+    await db.orders.put(updatedOrder)
+    console.log("📦 Updated local order after item removal.")
+
+    // ✅ Update syncQueue entry (if any)
+    const existingQueueEntry = await db.syncQueue
+      .where("data.orderId")
+      .equals(orderId)
+      .first()
+
+    if (existingQueueEntry) {
+      await db.syncQueue.put({
+        id: existingQueueEntry.id,
+        operation: "addOrder", // still treat as add/update
+        data: updatedOrder,
+      })
+      console.log("🔁 Updated syncQueue with modified order (item removed).")
+    } else if (!navigator.onLine) {
+      await addToSyncQueue("addOrder", updatedOrder)
+      console.log("⏳ Queued updated order for sync (offline removal).")
+    }
   } catch (error) {
     console.error("❌ Error removing order item:", error)
   }
 }
+
 
 export const cancelOrder = async (_id: string) => {
   const response = await fetch(`http://localhost:5050/api/orders/${_id}`, {
