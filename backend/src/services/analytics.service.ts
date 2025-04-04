@@ -1,4 +1,6 @@
 import Order from "../models/order.model"
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import crypto from "crypto"
 
 interface SalesReport {
   todaySales: number
