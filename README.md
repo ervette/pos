@@ -113,7 +113,7 @@ cd frontend; npm run dev;
 ```
 
 ```sh
-cd backend; npm run dev;
+cd backend; npm run dev; // Not required if using hybrid structure
 ```
 
 ### Installation
