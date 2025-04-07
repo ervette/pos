@@ -7,7 +7,7 @@ export const getOpenOrders = async (): Promise<Order[]> => {
   if (navigator.onLine) {
     try {
       const response = await fetch(
-        "http://localhost:5050/api/orders?status=open"
+        "http://18.130.143.223:5050/api/orders?status=open"
       )
       if (response.ok) {
         return await response.json()
@@ -42,7 +42,7 @@ export const getOrderByTable = async (
   if (navigator.onLine) {
     try {
       const response = await fetch(
-        `http://localhost:5050/api/orders?tableNumber=${tableNumber}&status=open`
+        `http://18.130.143.223:5050/api/orders?tableNumber=${tableNumber}&status=open`
       )
 
       if (!response.ok) {
@@ -103,7 +103,7 @@ export const removeOrderItem = async (
     if (navigator.onLine) {
       // ✅ Online: normal backend delete
       const response = await fetch(
-        `http://localhost:5050/api/orders/${orderId}/items/${orderItemId}`,
+        `http://18.130.143.223:5050/api/orders/${orderId}/items/${orderItemId}`,
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
@@ -170,7 +170,7 @@ export const removeOrderItem = async (
 
 
 export const cancelOrder = async (_id: string) => {
-  const response = await fetch(`http://localhost:5050/api/orders/${_id}`, {
+  const response = await fetch(`http://18.130.143.223:5050/api/orders/${_id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -214,7 +214,7 @@ export const changeOrderStatus = async (
     // Send update to MongoDB using orderId
     if (navigator.onLine) {
       const response = await fetch(
-        `http://localhost:5050/api/orders/orderId/${orderId}`,
+        `http://18.130.143.223:5050/api/orders/orderId/${orderId}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

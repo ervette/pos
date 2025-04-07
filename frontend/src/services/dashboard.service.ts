@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // API Base URL (Ensure it's correct)
-const API_BASE_URL = "http://localhost:5050/api/analytics";
+const API_BASE_URL = "http://18.130.143.223:5050/api/analytics";
 
 // Get Auth Headers
 const getAuthHeaders = () => {

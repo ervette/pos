@@ -55,7 +55,7 @@ export interface IMenuItemUpdatePayload {
 export const getMenuCategories = async (): Promise<MenuCategory[]> => {
   if (navigator.onLine) {
     try {
-      const response = await fetch("http://localhost:5050/api/menu/categories")
+      const response = await fetch("http://18.130.143.223:5050/api/menu/categories")
       if (response.ok) {
         const categories: MenuCategory[] = await response.json()
         return categories
@@ -76,7 +76,7 @@ export const fetchAndCacheMenu = async (): Promise<void> => {
   }
 
   try {
-    const response = await fetch("http://localhost:5050/api/menu")
+    const response = await fetch("http://18.130.143.223:5050/api/menu")
 
     if (!response.ok) {
       throw new Error(`Failed to fetch menu data: ${response.statusText}`)
@@ -158,7 +158,7 @@ export const getMenuItemsByCategory = async (
   if (navigator.onLine) {
     try {
       const response = await fetch(
-        `http://localhost:5050/api/menu/items?subCategory=${subCategory}`
+        `http://18.130.143.223:5050/api/menu/items?subCategory=${subCategory}`
       )
 
       if (response.ok) {
@@ -246,7 +246,7 @@ export const createMenuItem = async (
     ],
   }
 
-  const response = await fetch("http://localhost:5050/api/menu", {
+  const response = await fetch("http://18.130.143.223:5050/api/menu", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(requestBody),
@@ -262,7 +262,7 @@ export const updateSuperCategoryName = async (
   oldName: string,
   newName: string
 ): Promise<void> => {
-  const response = await fetch(`http://localhost:5050/api/menu/supercategory`, {
+  const response = await fetch(`http://18.130.143.223:5050/api/menu/supercategory`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -282,7 +282,7 @@ export const updateSubCategoryName = async (
   oldName: string,
   newName: string
 ): Promise<void> => {
-  const response = await fetch(`http://localhost:5050/api/menu/subcategory`, {
+  const response = await fetch(`http://18.130.143.223:5050/api/menu/subcategory`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -302,7 +302,7 @@ export const deleteSuperCategory = async (
   superCategory: string
 ): Promise<void> => {
   const response = await fetch(
-    `http://localhost:5050/api/menu/supercategory/${superCategory}`,
+    `http://18.130.143.223:5050/api/menu/supercategory/${superCategory}`,
     {
       method: "DELETE",
     }
@@ -319,7 +319,7 @@ export const deleteSubCategory = async (
   subCategory: string
 ): Promise<void> => {
   const response = await fetch(
-    `http://localhost:5050/api/menu/subcategory/${superCategory}/${subCategory}`,
+    `http://18.130.143.223:5050/api/menu/subcategory/${superCategory}/${subCategory}`,
     {
       method: "DELETE",
     }
@@ -340,7 +340,7 @@ export const updateMenuItem = async (
   }
 ): Promise<void> => {
   const response = await fetch(
-    `http://localhost:5050/api/menu/item/${itemId}`,
+    `http://18.130.143.223:5050/api/menu/item/${itemId}`,
     {
       method: "PUT",
       headers: {
@@ -358,7 +358,7 @@ export const updateMenuItem = async (
 
 export const deleteMenuItem = async (itemId: string): Promise<void> => {
   const response = await fetch(
-    `http://localhost:5050/api/menu/item/${itemId}`,
+    `http://18.130.143.223:5050/api/menu/item/${itemId}`,
     {
       method: "DELETE",
     }

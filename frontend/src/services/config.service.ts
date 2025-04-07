@@ -9,7 +9,7 @@ export const fetchAndCacheConfig = async (): Promise<void> => {
   }
 
   try {
-    const response = await fetch("http://localhost:5050/api/config")
+    const response = await fetch("http://18.130.143.223:5050/api/config")
     if (response.ok) {
       const config: IConfiguration = await response.json()
       console.log("Configuration fetched from backend:", config)
@@ -44,7 +44,7 @@ export const fetchConfigOnline = async (): Promise<{
   if (!navigator.onLine) return null
 
   try {
-    const response = await fetch("http://localhost:5050/api/config")
+    const response = await fetch("http://18.130.143.223:5050/api/config")
     if (!response.ok) throw new Error("Failed to fetch config")
 
     const config: { tables: number[] } = await response.json()
@@ -66,7 +66,7 @@ export const updateConfig = async (
 ): Promise<void> => {
   if (navigator.onLine) {
     try {
-      const response = await fetch("http://localhost:5050/api/config", {
+      const response = await fetch("http://18.130.143.223:5050/api/config", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(configData),

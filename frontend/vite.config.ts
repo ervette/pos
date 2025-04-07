@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     proxy: {
-      '/api': 'http://localhost:5000', // use http://192.168.0.3:5000 for later 
+      '/api': 'http://18.130.143.223:5050/', // use http://192.168.0.3:5000 for later 
     },
     hmr: {
       clientPort: 5173, // Hot Module Reload for external devices

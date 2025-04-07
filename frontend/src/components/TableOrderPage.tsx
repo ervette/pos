@@ -321,7 +321,7 @@ const TableOrderPage = () => {
     }
 
     // ✅ Fetch all menu data with correct typing
-    const menuData = await fetch("http://localhost:5050/api/menu")
+    const menuData = await fetch("http://18.130.143.223:5050/api/menu")
     const menuJson: MenuAPICategory[] = await menuData.json()
 
     // ✅ Build itemId → superCategory map
