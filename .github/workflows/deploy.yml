@@ -23,22 +23,22 @@ jobs:
 
       - name: 🚀 Deploy over SSH
         run: |
-          ssh -i ~/.ssh/id_rsa -p ${{ secrets.EC2_PORT }} ${{ secrets.EC2_HOST }} << 'EOF'
+          ssh -tt -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p ${{ secrets.EC2_PORT }} ${{ secrets.EC2_HOST }} << 'EOF'
             set -e
 
             cd /home/ec2-user/pos/backend
 
-            echo "Pulling code..."
+            echo "🔄 Pulling latest code..."
             git fetch origin awsdeployment
             git reset --hard origin/awsdeployment
 
-            echo "Installing dependencies..."
+            echo "📦 Installing dependencies..."
             npm install
 
-            echo "Building app..."
+            echo "🔨 Building app..."
             npm run build
 
-            echo "Killing old app..."
+            echo "🛑 Killing old app..."
             pkill -f "node dist/server.js" || true
 
             echo "🚀 Starting app..."
@@ -46,3 +46,4 @@ jobs:
 
             echo "✅ Deployment complete."
           EOF
+
