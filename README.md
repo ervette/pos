@@ -24,7 +24,7 @@
     <img src="./frontend/public/icon.svg" alt="Logo" width="80" height="80">
   </a>
 
-  <h3 align="center">POS (Point of Sale) by Kiril Talalaiko</h3>
+  <h3 align="center"> HostIQ POS (Point of Sale) by Kiril Talalaiko</h3>
 
   <p align="center">
     A POS system that truly improves usability and experience! 
