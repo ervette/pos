@@ -1,0 +1,46 @@
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches:
+      - awsdeployment
+
+jobs:
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy over SSH
+        run: |
+          ssh -i ~/.ssh/id_rsa -p ${{ secrets.EC2_PORT }} ${{ secrets.EC2_HOST }} << 'EOF'
+            cd pos/backend
+
+            echo "Pulling latest code..."
+            git checkout awsdeployment
+            git pull origin awsdeployment
+
+            echo "Installing dependencies..."
+            npm install
+
+            echo "Building app..."
+            npm run build
+
+            echo "Killing old app..."
+            pkill -f "node dist/server.js" || true
+
+            echo "Starting app..."
+            nohup npm start > output.log 2>&1 &
+
+            echo "✅ Deployment complete."
+          EOF
