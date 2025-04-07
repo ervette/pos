@@ -48,10 +48,10 @@ app.use("/api/config", configRoutes)
 app.use("/api/sync", syncRoutes)
 app.use("/api/auth", authRoutes)
 
-const PORT = process.env.PORT || 5050
-app.listen(PORT, () =>
-  console.log(`Server running at http://localhost:${PORT}`)
-)
+const PORT = Number(process.env.PORT) || 5050
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running at http://0.0.0.0:${PORT}`)
+})
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 app._router.stack.forEach((middleware: any) => {
