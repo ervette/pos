@@ -17,6 +17,7 @@ import LogoHeader from "../components/LogoHeader"
 import { generatePrintableBillHTML } from "../services/bill.service"
 import { getServerNameFromToken } from "../services/auth.service"
 import "../styles/TableOrderPage.css"
+import { v4 as uuidv4 } from "uuid"
 
 interface MenuItem {
   itemId: string
@@ -151,7 +152,7 @@ const TableOrderPage = () => {
       )
 
       const newOrder: Order = {
-        orderId: crypto.randomUUID(), // ✅ Guarantees a string orderId
+        orderId: uuidv4(), // ✅ Guarantees a string orderId
         tableNumber: tableNum,
         items: [],
         totalPrice: 0,
@@ -173,7 +174,7 @@ const TableOrderPage = () => {
 
     // ✅ Add the item to the order
     const newItem: OrderItem = {
-      orderItemId: crypto.randomUUID(),
+      orderItemId: uuidv4(),
       itemId: selectedItem.itemId,
       name: selectedItem.name,
       variation: selectedVariation,
@@ -264,12 +265,13 @@ const TableOrderPage = () => {
 
     const generateObjectId = (): string =>
       Array.from(crypto.getRandomValues(new Uint8Array(12)))
-        .map((b) => b.toString(16).padStart(2, "0"))
+        .map((b: number) => b.toString(16).padStart(2, "0"))
         .join("")
+    
 
     // Create a new gratuity item
     const gratuityItem: OrderItem = {
-      orderItemId: crypto.randomUUID(),
+      orderItemId: uuidv4(),
       itemId: generateObjectId(),
       name: "Gratuity",
       variation: "flat", // ✅ Required by TS & backend
@@ -379,10 +381,10 @@ const TableOrderPage = () => {
 
   const handlePay = async () => {
     if (!order) return
-  
+
     console.log("🔄 Changing status to:", selectedPayment)
     await changeOrderStatus(order.orderId, selectedPayment)
-  
+
     // Optionally refetch order
     try {
       const updatedOrder = await getOrderByTable(tableNum)
@@ -390,10 +392,9 @@ const TableOrderPage = () => {
     } catch (err) {
       console.warn("⚠️ Failed to refetch order after payment.", err)
     }
-  
+
     navigate("/tables")
   }
-  
 
   return (
     <div className="table-order-container">
